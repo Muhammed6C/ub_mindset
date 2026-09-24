@@ -1,0 +1,73 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ub_mindset_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ub_mindset
+      POSTGRES_USER: ub_user
+      POSTGRES_PASSWORD: ub_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ub_user -d ub_mindset"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ub_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ub_mindset_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      APP_NAME: "UB Mindset API"
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ub_mindset
+      DB_USERNAME: ub_user
+      DB_PASSWORD: ub_password
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ub_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ub_mindset_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:8000/api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - ub_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  ub_network:
+    driver: bridge
