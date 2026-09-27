@@ -11,6 +11,10 @@ const NAV_LINKS = [
 export default function Navbar({ cartCount = 0 }) {
   const [scrollState, setScrollState] = useState('top'); // 'top' | 'pill' | 'exited'
   const [mobileOpen, setMobileOpen]   = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
   const location = useLocation();
   const isHome = location.pathname === '/';
 
@@ -88,7 +92,7 @@ export default function Navbar({ cartCount = 0 }) {
             ? '0 12px 36px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.03)'
             : 'none',
           opacity: isExited ? 0 : 1,
-          pointerEvents: isExited ? 'none' : 'all',
+          zIndex: 130,
           zIndex: 100,
           display: 'flex',
           alignItems: 'center',
@@ -131,8 +135,9 @@ export default function Navbar({ cartCount = 0 }) {
             />
           </Link>
 
-          {/* ── Séparateur ── */}
+          {/* ── Séparateur (desktop uniquement) ── */}
           <div
+            className="hidden md:block"
             style={{
               width: '1px',
               height: isPill ? '14px' : '18px',
@@ -145,7 +150,6 @@ export default function Navbar({ cartCount = 0 }) {
           {/* ── LIENS DE NAVIGATION (desktop) ── */}
           <div
             style={{
-              display: 'flex',
               alignItems: 'center',
               gap: isPill ? '22px' : '28px',
               flex: 1,
@@ -221,94 +225,676 @@ export default function Navbar({ cartCount = 0 }) {
             </Link>
           </div>
 
-          {/* ── BURGER mobile ── */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
+          {/* ── ICÔNES MOBILE (recherche / menu / panier) ── */}
+          <div
             className="flex md:hidden"
             style={{
               marginLeft: 'auto',
-              flexDirection: 'column',
-              gap: '4px',
-              padding: '6px',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
+              alignItems: 'center',
+              gap: '20px',
+              paddingRight: '8px',
             }}
-            aria-label="Menu"
           >
-            {[0, 1, 2].map(i => (
-              <span
-                key={i}
-                style={{
-                  display: 'block',
-                  width: isPill ? '18px' : '20px',
-                  height: '1px',
-                  background: '#0A0A0A',
-                  transition: 'transform 0.3s ease, opacity 0.3s ease, width 0.3s ease',
-                  transform:
-                    i === 0 && mobileOpen ? 'rotate(45deg) translate(4px, 4px)' :
-                    i === 2 && mobileOpen ? 'rotate(-45deg) translate(4px, -4px)' : 'none',
-                  opacity: i === 1 && mobileOpen ? 0 : 1,
-                }}
-              />
-            ))}
-          </button>
+            {/* Icône recherche */}
+            <button
+              onClick={() => setSearchOpen(!searchOpen)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '6px',
+                color: '#0A0A0A',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              aria-label="Rechercher"
+            >
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </button>
+
+            {/* Icône hamburger */}
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '6px',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              aria-label="Menu"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {mobileOpen ? (
+                  <>
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </>
+                ) : (
+                  <>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                  </>
+                )}
+              </svg>
+            </button>
+
+            {/* Icône panier */}
+            <Link
+              to="/cart"
+              style={{
+                position: 'relative',
+                color: '#0A0A0A',
+                display: 'flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+              }}
+              aria-label="Panier"
+            >
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="9" cy="21" r="1"/>
+                <circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+              {cartCount > 0 && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '-2px',
+                    right: '-4px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minWidth: '16px',
+                    height: '16px',
+                    borderRadius: '9999px',
+                    background: '#0A0A0A',
+                    color: '#F2F1EF',
+                    fontSize: '9px',
+                    fontWeight: 700,
+                    padding: '0 3px',
+                  }}
+                >
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          </div>
         </div>
       </nav>
 
+      {/* ══════════════════════════════════════════════════════════════
+          BOTTOM NAVIGATION GLASSMORPHIQUE — style Instagram (≤768px)
+          ══════════════════════════════════════════════════════════════ */}
+      <nav
+        className="flex md:hidden"
+        style={{
+          position: 'fixed',
+          bottom: '8px',
+          left: '8px',
+          right: '8px',
+          zIndex: 100,
+          justifyContent: 'space-around',
+          padding: '8px 14px calc(8px + env(safe-area-inset-bottom))',
+          padding: '16px 20px calc(16px + env(safe-area-inset-bottom))',
+          background: 'rgba(255, 255, 255, 0.45)',
+          backdropFilter: 'blur(40px) saturate(200%)',
+          borderRadius: '28px',
+          borderRadius: '44px',
+          border: '1px solid rgba(255, 255, 255, 0.5)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 -1px 0 rgba(0, 0, 0, 0.03)',
+        }}
+      >
+        {[
+          { label: 'Accueil',    to: '/',        icon: 'home' },
+          { label: 'Collection', to: '/catalog', icon: 'grid' },
+          { label: 'Lookbook',   to: '/lookbook',icon: 'book' },
+          { label: 'Panier',     to: '/cart',    icon: 'cart' },
+        ].map(item => {
+          const isActive = location.pathname === item.to;
+          return (
+            <Link
+              key={item.label}
+              to={item.to}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '4px',
+                textDecoration: 'none',
+                color: isActive ? '#0A0A0A' : '#8C8C8C',
+                fontWeight: isActive ? 700 : 500,
+                fontSize: '0.55rem',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                minWidth: '56px',
+                transition: 'color 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                transform: isActive ? 'scale(1.08)' : 'scale(1)',
+              }}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill={isActive ? '#0A0A0A' : 'none'}
+                stroke={isActive ? '#0A0A0A' : '#8C8C8C'}
+                strokeWidth={isActive ? 2 : 1.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ transition: 'fill 0.25s ease, stroke 0.25s ease' }}
+              >
+                {item.icon === 'home' && <><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></>}
+                {item.icon === 'grid' && <><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></>}
+                {item.icon === 'book' && <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></>}
+                {item.icon === 'cart' && <><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></>}
+              </svg>
+              {item.label}
+            </Link>
+          );
+        })}
+      </nav>
+
       {/* ══════════════════════════════════════════════
-          MENU MOBILE (OVERLAY)
+          BARRE DE RECHERCHE — mobile uniquement
           ════════════════════════════════════════════ */}
       <div
         className="md:hidden"
         style={{
           position: 'fixed',
-          inset: 0,
-          zIndex: 90,
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 110,
           background: 'rgba(242, 241, 239, 0.97)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          display: 'flex',
-          flexDirection: 'column',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+          padding: '16px 20px',
+          display: 'block',
           alignItems: 'center',
-          justifyContent: 'center',
-          gap: '32px',
-          opacity: mobileOpen ? 1 : 0,
-          pointerEvents: mobileOpen ? 'all' : 'none',
-          transform: mobileOpen ? 'translateY(0)' : 'translateY(-8px)',
-          transition: 'opacity 0.38s ease, transform 0.38s ease',
+          gap: '12px',
+          opacity: searchOpen ? 1 : 0,
+          pointerEvents: searchOpen ? 'all' : 'none',
+          transform: searchOpen ? 'translateY(0)' : 'translateY(-100%)',
+          transition: 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
-        {[...NAV_LINKS, { label: 'Panier', to: '/cart' }].map(item => (
-          <Link
-            key={item.label}
-            to={item.to}
-            onClick={() => setMobileOpen(false)}
-            style={{
-              fontFamily: '"Archivo", sans-serif',
-              fontWeight: 900,
-              fontSize: '2rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.04em',
-              color: '#0A0A0A',
-              textDecoration: 'none',
-            }}
-          >
-            {item.label}
-          </Link>
-        ))}
-        <div style={{ width: '32px', height: '1px', background: '#D9D8D5', margin: '4px 0' }} />
-        <p
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          placeholder="Rechercher un vêtement..."
           style={{
+            flex: 1,
+            border: 'none',
+            background: 'none',
+            outline: 'none',
             fontFamily: '"Archivo Narrow", sans-serif',
-            fontSize: '0.52rem',
-            textTransform: 'uppercase',
-            letterSpacing: '0.3em',
+            fontSize: '0.95rem',
+            color: '#0A0A0A',
+            padding: '8px 0',
+          }}
+        />
+        <button
+          onClick={() => { setSearchOpen(false); setSearchQuery(''); }}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
             color: '#8C8C8C',
+            fontSize: '0.8rem',
+            fontFamily: '"Archivo Narrow", sans-serif',
+            textTransform: 'uppercase',
+            letterSpacing: '0.15em',
+            padding: '6px',
           }}
         >
-          SPORTSWEAR · PREMIUM · 2026
-        </p>
+          Annuler
+        </button>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════
+          SIDEBAR MOBILE — style Gmail (≤768px)
+          ══════════════════════════════════════════════════════════════ */}
+      {/* Overlay assombri */}
+      <div
+        className="md:hidden"
+        onClick={() => setMobileOpen(false)}
+        style={{
+          position: 'fixed',
+          zIndex: 105,
+          zIndex: 95,
+          background: 'rgba(0, 0, 0, 0.4)',
+          opacity: mobileOpen ? 1 : 0,
+          pointerEvents: mobileOpen ? 'all' : 'none',
+          transition: 'opacity 0.3s ease',
+        }}
+      />
+
+      {/* Panneau sidebar */}
+      <div
+        className="md:hidden"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          zIndex: 115,
+          zIndex: 96,
+          width: '280px',
+          maxWidth: '85vw',
+          background: '#F2F1EF',
+          boxShadow: '4px 0 24px rgba(0, 0, 0, 0.12)',
+          display: 'flex',
+          flexDirection: 'column',
+          transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)',
+          overflowY: 'auto',
+        }}
+      >
+        {/* Header sidebar */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px 20px',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+          }}
+        >
+          <img
+            src="/logo.png"
+            alt="UB Mindset"
+            style={{ height: '32px', width: 'auto', mixBlendMode: 'multiply' }}
+          />
+          <button
+            onClick={() => setMobileOpen(false)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '8px',
+              color: '#0A0A0A',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+            aria-label="Fermer le menu"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Liens de navigation */}
+        <div style={{ flex: 1, padding: '8px 0' }}>
+          {[
+            { label: 'Collection',     to: '/catalog',          icon: 'grid' },
+            { label: 'Nouveautés',     to: '/catalog?filter=new', icon: 'sparkle' },
+            { label: 'Lookbook',       to: '/lookbook',         icon: 'book' },
+            { label: 'Notre Histoire', to: '/about',            icon: 'info' },
+            { label: 'Panier',         to: '/cart',             icon: 'cart' },
+          ].map(item => {
+            const isActive = location.pathname === item.to;
+            return (
+              <Link
+                key={item.label}
+                to={item.to}
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px',
+                  padding: '12px 20px',
+                  textDecoration: 'none',
+                  fontFamily: '"Archivo Narrow", "Archivo", sans-serif',
+                  fontWeight: 600,
+                  fontSize: '0.82rem',
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: isActive ? '#0A0A0A' : '#3A3A3A',
+                  background: isActive ? 'rgba(10, 10, 10, 0.04)' : 'transparent',
+                  borderLeft: isActive ? '3px solid #0A0A0A' : '3px solid transparent',
+                  transition: 'background 0.2s ease, color 0.2s ease',
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={isActive ? '#0A0A0A' : '#3A3A3A'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  {item.icon === 'grid' && <><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></>}
+                  {item.icon === 'sparkle' && <><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/></>}
+                  {item.icon === 'book' && <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></>}
+                  {item.icon === 'info' && <><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></>}
+                  {item.icon === 'cart' && <><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></>}
+                </svg>
+                {item.label}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Footer sidebar — Connexion/Inscription */}
+        <div
+          style={{
+            padding: '16px 20px',
+            borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+          }}
+        >
+          <button
+            onClick={() => { setMobileOpen(false); setAuthMode('login'); setAuthOpen(true); }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              width: '100%',
+              padding: '12px 16px',
+              background: '#0A0A0A',
+              color: '#F2F1EF',
+              border: 'none',
+              borderRadius: '2px',
+              cursor: 'pointer',
+              fontFamily: '"Archivo Narrow", "Archivo", sans-serif',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              justifyContent: 'center',
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F2F1EF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            Connexion / Inscription
+          </button>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════
+          MODAL CONNEXION / INSCRIPTION — mobile uniquement
+          ══════════════════════════════════════════════════════════════ */}
+      <div
+        className="md:hidden"
+        style={{
+          position: 'fixed',
+          zIndex: 140,
+          zIndex: 120,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px',
+          background: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          opacity: authOpen ? 1 : 0,
+          pointerEvents: authOpen ? 'all' : 'none',
+          transition: 'opacity 0.3s ease',
+        }}
+        onClick={() => setAuthOpen(false)}
+      >
+        <div
+          onClick={e => e.stopPropagation()}
+          style={{
+            width: '100%',
+            maxWidth: '400px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            background: '#FFFFFF',
+            borderRadius: '8px',
+            boxShadow: '0 24px 64px rgba(0, 0, 0, 0.2)',
+            transform: authOpen ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.96)',
+            transition: 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+        >
+          {/* Header modal */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '20px 24px 0',
+            }}
+          >
+            <div style={{ display: 'flex', gap: '4px' }}>
+              {['login', 'register'].map(mode => (
+                <button
+                  key={mode}
+                  onClick={() => setAuthMode(mode)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '8px 16px',
+                    fontFamily: '"Archivo Narrow", "Archivo", sans-serif',
+                    fontWeight: 700,
+                    fontSize: '0.72rem',
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color: authMode === mode ? '#0A0A0A' : '#8C8C8C',
+                    borderBottom: authMode === mode ? '2px solid #0A0A0A' : '2px solid transparent',
+                    transition: 'color 0.2s ease, border-color 0.2s ease',
+                  }}
+                >
+                  {mode === 'login' ? 'Connexion' : 'Inscription'}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setAuthOpen(false)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '6px',
+                color: '#8C8C8C',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              aria-label="Fermer"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+
+          {/* Corps du formulaire */}
+          <div style={{ padding: '24px' }}>
+            <h2
+              style={{
+                fontFamily: '"Archivo", sans-serif',
+                fontWeight: 900,
+                fontSize: '1.4rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.02em',
+                color: '#0A0A0A',
+                marginBottom: '4px',
+              }}
+            >
+              {authMode === 'login' ? 'Bon retour' : 'Créer un compte'}
+            </h2>
+            <p
+              style={{
+                fontFamily: '"Archivo Narrow", sans-serif',
+                fontSize: '0.72rem',
+                color: '#8C8C8C',
+                marginBottom: '24px',
+              }}
+            >
+              {authMode === 'login'
+                ? 'Connectez-vous pour accéder à votre compte.'
+                : 'Rejoignez UB Mindset en quelques secondes.'}
+            </p>
+
+            <form
+              onSubmit={e => { e.preventDefault(); setAuthOpen(false); }}
+              style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+            >
+              {authMode === 'register' && (
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontFamily: '"Archivo Narrow", sans-serif',
+                      fontSize: '0.65rem',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.2em',
+                      color: '#3A3A3A',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    Nom complet
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Votre nom"
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px',
+                      border: '1px solid #D9D8D5',
+                      borderRadius: '2px',
+                      fontFamily: '"Archivo Narrow", sans-serif',
+                      fontSize: '0.85rem',
+                      color: '#0A0A0A',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      transition: 'border-color 0.2s ease',
+                    }}
+                  />
+                </div>
+              )}
+
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    fontFamily: '"Archivo Narrow", sans-serif',
+                    fontSize: '0.65rem',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.2em',
+                    color: '#3A3A3A',
+                    marginBottom: '6px',
+                  }}
+                >
+                  Adresse email
+                </label>
+                <input
+                  type="email"
+                  placeholder="vous@exemple.com"
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    border: '1px solid #D9D8D5',
+                    borderRadius: '2px',
+                    fontFamily: '"Archivo Narrow", sans-serif',
+                    fontSize: '0.85rem',
+                    color: '#0A0A0A',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s ease',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    fontFamily: '"Archivo Narrow", sans-serif',
+                    fontSize: '0.65rem',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.2em',
+                    color: '#3A3A3A',
+                    marginBottom: '6px',
+                  }}
+                >
+                  Mot de passe
+                </label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    border: '1px solid #D9D8D5',
+                    borderRadius: '2px',
+                    fontFamily: '"Archivo Narrow", sans-serif',
+                    fontSize: '0.85rem',
+                    color: '#0A0A0A',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s ease',
+                  }}
+                />
+              </div>
+
+              {authMode === 'login' && (
+                <div style={{ textAlign: 'right' }}>
+                  <button
+                    type="button"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontFamily: '"Archivo Narrow", sans-serif',
+                      fontSize: '0.68rem',
+                      color: '#8C8C8C',
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    Mot de passe oublié ?
+                  </button>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                style={{
+                  padding: '14px',
+                  background: '#0A0A0A',
+                  color: '#F2F1EF',
+                  border: 'none',
+                  borderRadius: '2px',
+                  cursor: 'pointer',
+                  fontFamily: '"Archivo Narrow", "Archivo", sans-serif',
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  letterSpacing: '0.25em',
+                  textTransform: 'uppercase',
+                  marginTop: '4px',
+                  transition: 'background 0.2s ease',
+                }}
+              >
+                {authMode === 'login' ? 'Se connecter' : 'Créer mon compte'}
+              </button>
+            </form>
+
+            <div
+              style={{
+                marginTop: '20px',
+                textAlign: 'center',
+                fontFamily: '"Archivo Narrow", sans-serif',
+                fontSize: '0.62rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.25em',
+                color: '#C4C3C0',
+              }}
+            >
+              SPORTSWEAR · MINDSET · PREMIUM
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

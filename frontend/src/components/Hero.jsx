@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import heroImg from '../assets/image-hero-official.png';
 
@@ -10,9 +10,20 @@ const RIGHT_TAGS = ['BUILT', 'THROUGH', 'PAIN'];
 export default function Hero() {
   const imgRef     = useRef(null);
   const sectionRef = useRef(null);
+  const [imgLoaded, setImgLoaded] = useState(false);
+
+  /* Mobile uniquement : déclenche l'animation CSS de zoom-out de la photo */
+  useEffect(() => {
+    if (window.matchMedia('(max-width: 768px)').matches) {
+      const t = setTimeout(() => setImgLoaded(true), 350);
+      return () => clearTimeout(t);
+    }
+  }, []);
 
   const handleParallax = useCallback(() => {
     if (!imgRef.current) return;
+    /* Mobile (≤768px) : parallax désactivé — l'animation CSS gère l'entrée */
+    if (window.matchMedia('(max-width: 768px)').matches) return;
     const progress = Math.min(1, Math.max(0, window.scrollY / window.innerHeight));
     imgRef.current.style.transform = `scale(0.82) translateY(${70 + progress * 45}px)`;
   }, []);
@@ -94,7 +105,7 @@ export default function Hero() {
           ref={imgRef}
           src={heroImg}
           alt="UB Mindset — Collection 2026"
-          className="hero-img"
+          className={`hero-img${imgLoaded ? ' hero-img-loaded' : ''}`}
         />
 
         {/* ── Taglines verticales DROITE ── */}
@@ -374,6 +385,186 @@ export default function Hero() {
           .anim-fade-in, .anim-fade-in-up, .anim-slide-left, .anim-slide-right {
             animation-duration: 0.01ms !important;
             animation-delay: 0ms !important;
+          }
+        }
+
+        /* ════════════════════════════════════════════════════════════
+           MOBILE — ≤768px  (surcharges uniquement, desktop intact)
+           ════════════════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+
+          /* ── 1. Structure empilée : nav → titre → photo → CTA ── */
+          .hero-section {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
+            padding-top: 84px !important;
+          }
+
+          .hero-left-col {
+            display: contents !important;
+          }
+
+          /* Ordre : category/titre/séparateur/saison (1) → photo (2) → CTA (3) */
+          .hero-category,
+          .hero-title-wrap,
+          .hero-separator,
+          .hero-season {
+            order: 1 !important;
+            width: 100% !important;
+            padding-left: 24px !important;
+            padding-right: 24px !important;
+          }
+
+          .hero-right-col {
+            order: 2 !important;
+            position: relative !important;
+            inset: auto !important;
+            width: 100% !important;
+            height: 32vh !important;
+            min-height: 200px !important;
+            flex: none !important;
+            overflow: hidden !important;
+          }
+
+          .hero-cta-wrap {
+            order: 3 !important;
+            padding: 0 24px !important;
+            margin-top: 18px !important;
+          }
+
+          .hero-edition { display: none !important; }
+
+          /* ── 5. Mots verticaux : masqués proprement ── */
+          .hero-tags-left,
+          .hero-tags-right { display: none !important; }
+
+          /* ── 2. Titre réduit, 2 lignes, contraste noir/gris ── */
+          .hero-title {
+            font-size: 2.05rem !important;
+            line-height: 1.12 !important;
+            letter-spacing: -0.01em !important;
+            margin-bottom: 14px !important;
+          }
+          .hero-title-line1,
+          .hero-title-line2 { display: block !important; }
+          .hero-title-line1 { color: #0A0A0A !important; }
+          .hero-title-line2 { color: #6B6B6B !important; }
+
+          .hero-category { font-size: 0.5rem !important; margin-bottom: 8px !important; }
+          .hero-separator { margin-bottom: 10px !important; }
+          .hero-season { font-size: 0.55rem !important; margin-bottom: 0 !important; }
+
+          /* ── 4. CTA tactile (min 48px, effet de pression) ── */
+          .hero-cta {
+            display: flex !important;
+            width: 100% !important;
+            justify-content: center !important;
+            min-height: 52px !important;
+            padding: 16px 24px !important;
+            font-size: 0.9rem !important;
+            -webkit-tap-highlight-color: transparent !important;
+            touch-action: manipulation !important;
+          }
+          .hero-cta:active {
+            transform: scale(0.96) !important;
+            background: #2a2a2a !important;
+          }
+
+          /* ── 3. Animations d'entrée (0.6–0.8s, transform/opacity uniquement) ── */
+
+          /* Désactive les animations globales (anim-hidden, anim-fade-in, etc.) */
+          .hero-section .anim-hidden,
+          .hero-section .anim-fade-in,
+          .hero-section .anim-fade-in-up,
+          .hero-section .anim-slide-left,
+          .hero-section .anim-slide-right {
+            animation: none !important;
+            animation-delay: 0ms !important;
+            opacity: 1 !important;
+          }
+
+          /* Les conteneurs parents ne doivent pas rester invisibles */
+          .hero-title-wrap,
+          .hero-cta-wrap {
+            opacity: 1 !important;
+            transform: none !important;
+          }
+
+          /* Titre : forcé visible (les animations globales anim-hidden/anim-fade-in-up
+             de index.css maintenaient opacity:0 pendant 1.4-2.2s et empêchaient l'affichage) */
+          .hero-title-line1,
+          .hero-title-line2 {
+            opacity: 1 !important;
+            animation: none !important;
+          }
+
+          /* Blocs secondaires : fade simple */
+          .hero-category,
+          .hero-separator,
+          .hero-season {
+            opacity: 0 !important;
+            animation: heroFadeIn 0.45s ease forwards !important;
+          }
+          .hero-category  { animation-delay: 0.05s !important; }
+          .hero-separator { animation-delay: 0.3s !important; }
+          .hero-season    { animation-delay: 0.3s !important; }
+
+          /* Photo : fade + léger zoom-out */
+          .hero-img {
+            transform: scale(1.08) !important;
+            opacity: 0 !important;
+            transition:
+              transform 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.35s,
+              opacity 0.45s ease 0.35s !important;
+            will-change: transform, opacity !important;
+          }
+          .hero-img.hero-img-loaded {
+            transform: scale(1) translateY(0) !important;
+            opacity: 1 !important;
+          }
+
+          /* CTA : apparition en dernier avec léger rebond */
+          .hero-cta-wrap {
+            opacity: 0 !important;
+            animation: heroCtaPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.55s forwards !important;
+          }
+
+          /* Indicateur SCROLL */
+          .hero-scroll {
+            bottom: 14px !important;
+            opacity: 0 !important;
+            animation: heroFadeIn 0.4s ease 0.75s forwards !important;
+          }
+
+          /* Keyframes mobiles */
+          @keyframes heroLineUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+          }
+          @keyframes heroFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+          }
+          @keyframes heroCtaPop {
+            from { opacity: 0; transform: translateY(12px) scale(0.94); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+          }
+
+          /* Reduced motion */
+          @media (prefers-reduced-motion: reduce) {
+            .hero-title-line1,
+            .hero-title-line2,
+            .hero-category,
+            .hero-separator,
+            .hero-season,
+            .hero-cta-wrap,
+            .hero-scroll,
+            .hero-img {
+              animation-duration: 0.01ms !important;
+              animation-delay: 0ms !important;
+              transition-duration: 0.01ms !important;
+            }
           }
         }
 
