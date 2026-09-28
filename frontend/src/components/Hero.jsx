@@ -565,6 +565,40 @@ export default function Hero() {
         }
 
         /* ════════════════════════════════════════
+           MOBILE — ≤768px
+           ════════════════════════════════════════ */
+        @media (max-width: 768px) {
+          .hv2-img {
+            object-position: center 6% !important;
+          }
+          .hv2-img-fade-bottom {
+            height: 56% !important;
+          }
+          .hv2-content {
+            justify-content: flex-end !important;
+            padding: 84px 20px 58px !important;
+          }
+          .hv2-title-wrap {
+            margin-bottom: 12px !important;
+          }
+          .hv2-divider {
+            margin-bottom: 10px !important;
+          }
+          .hv2-subtitle {
+            margin-bottom: 18px !important;
+          }
+          .hv2-cta-group {
+            margin-bottom: 18px !important;
+          }
+          .hv2-trust {
+            margin-bottom: 20px !important;
+          }
+          .hv2-edition {
+            display: none !important;
+          }
+        }
+
+        /* ════════════════════════════════════════
            TABLETTE — 769px à 1024px
            ════════════════════════════════════════ */
         @media (min-width: 769px) and (max-width: 1024px) {
@@ -588,8 +622,8 @@ export default function Hero() {
             order: 1;
             width: 55%;
             flex-shrink: 0;
-            padding: 0 40px 70px 52px;
-            justify-content: center;
+            padding: 100px 40px 76px 52px;
+            justify-content: flex-end;
           }
           .hv2-line1, .hv2-line2 {
             font-size: clamp(3.4rem, 5vw, 4.2rem);
@@ -627,8 +661,8 @@ export default function Hero() {
             order: 1;
             width: 58%;
             flex-shrink: 0;
-            padding: 0 60px 80px 88px;
-            justify-content: center;
+            padding: 120px 60px 84px 88px;
+            justify-content: flex-end;
           }
           .hv2-line1, .hv2-line2 {
             font-size: clamp(4rem, 5.5vw, 5.5rem);
@@ -652,11 +686,14 @@ export default function Hero() {
            PETIT MOBILE — ≤ 480px
            ════════════════════════════════════════ */
         @media (max-width: 480px) {
+          .hv2-img {
+            object-position: center 4% !important;
+          }
           .hv2-line1, .hv2-line2 {
-            font-size: clamp(2.4rem, 9vw, 2.8rem);
+            font-size: clamp(2.3rem, 8.5vw, 2.7rem);
           }
           .hv2-content {
-            padding: 96px 20px 90px;
+            padding: 80px 18px 52px !important;
           }
           .hv2-cta-primary {
             width: 100%;
