@@ -1,31 +1,49 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
-import heroImg from '../assets/image-hero-official.png';
 
-const LEFT_BG = '#E2E1DE';
+/* ─────────────────────────────────────────────
+   UB MINDSET — HERO V2
+   · Image WebP responsive (srcset)
+   · Layout split desktop / overlay mobile
+   · Titre impactant + CTA double
+   · Barre de confiance (trust bar)
+   · Parallax léger sur desktop
+   · prefers-reduced-motion respecté
+   ───────────────────────────────────────────── */
 
-const LEFT_TAGS  = ['DISCIPLINE', 'FOCUS', 'PROGRESSION'];
-const RIGHT_TAGS = ['BUILT', 'THROUGH', 'PAIN'];
+const TRUST_ITEMS = [
+  { icon: '⚡', label: 'LIVRAISON DAKAR · PARIS' },
+  { icon: '✦',  label: 'ÉDITION LIMITÉE — 50 PIÈCES' },
+  { icon: '↩',  label: 'RETOURS GRATUITS 14J' },
+];
 
 export default function Hero() {
-  const imgRef     = useRef(null);
-  const sectionRef = useRef(null);
-  const [imgLoaded, setImgLoaded] = useState(false);
+  const imgRef      = useRef(null);
+  const sectionRef  = useRef(null);
+  const [entered, setEntered] = useState(false);
+  const [trustIdx, setTrustIdx] = useState(0);
 
-  /* Mobile uniquement : déclenche l'animation CSS de zoom-out de la photo */
+  /* ── Entrée différée pour déclencher les transitions CSS ── */
   useEffect(() => {
-    if (window.matchMedia('(max-width: 768px)').matches) {
-      const t = setTimeout(() => setImgLoaded(true), 350);
-      return () => clearTimeout(t);
-    }
+    const t = setTimeout(() => setEntered(true), 80);
+    return () => clearTimeout(t);
   }, []);
 
+  /* ── Rotation automatique de la trust bar ── */
+  useEffect(() => {
+    const id = setInterval(
+      () => setTrustIdx(i => (i + 1) % TRUST_ITEMS.length),
+      3000
+    );
+    return () => clearInterval(id);
+  }, []);
+
+  /* ── Parallax léger sur desktop ── */
   const handleParallax = useCallback(() => {
     if (!imgRef.current) return;
-    /* Mobile (≤768px) : parallax désactivé — l'animation CSS gère l'entrée */
-    if (window.matchMedia('(max-width: 768px)').matches) return;
-    const progress = Math.min(1, Math.max(0, window.scrollY / window.innerHeight));
-    imgRef.current.style.transform = `scale(0.82) translateY(${70 + progress * 45}px)`;
+    if (window.innerWidth < 1025) return;
+    const p = Math.min(1, Math.max(0, window.scrollY / window.innerHeight));
+    imgRef.current.style.transform = `scale(1.06) translateY(${p * 60}px)`;
   }, []);
 
   useEffect(() => {
@@ -41,531 +59,641 @@ export default function Hero() {
     <section
       ref={sectionRef}
       id="hero-section"
-      className="hero-section"
+      className="hv2-section"
+      aria-label="UB Mindset — Collection Automne-Hiver 2026"
     >
-      {/* ═══════════════════════════════════════════════
-          COLONNE GAUCHE — texte
-          ════════════════════════════════════════════ */}
-      <div className="hero-left-col">
-        {/* ── Taglines verticales GAUCHE ── */}
-        <div className="anim-hidden anim-slide-left anim-delay-800 hero-tags-left">
-          {LEFT_TAGS.map((tag, i) => (
-            <React.Fragment key={tag}>
-              {i > 0 && <div className="hero-tag-sep" />}
-              <span className="hero-tag hero-tag-left">{tag}</span>
+
+      {/* ══════════════════════════════════════════
+          IMAGE PLEINE HAUTEUR (droite sur desktop,
+          fond complet sur mobile)
+          ══════════════════════════════════════════ */}
+      <div className="hv2-img-col">
+        <img
+          ref={imgRef}
+          src="/hero-desktop.webp"
+          srcSet="/hero-mobile.webp 480w, /hero-desktop.webp 1024w"
+          sizes="(max-width: 768px) 100vw, 40vw"
+          alt="Athlète UB Mindset — Collection AH 2026"
+          className="hv2-img"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          draggable="false"
+        />
+
+        {/* Gradient de fondu — droite vers gauche sur desktop */}
+        <div className="hv2-img-fade-left" aria-hidden="true" />
+        {/* Gradient de fondu — bas sur mobile */}
+        <div className="hv2-img-fade-bottom" aria-hidden="true" />
+
+        {/* Badge NEW DROP */}
+        <div className={`hv2-badge ${entered ? 'hv2-badge--in' : ''}`} aria-label="Nouvelle collection">
+          <span className="hv2-badge-text">NEW DROP</span>
+          <span className="hv2-badge-dot" aria-hidden="true" />
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════
+          COLONNE TEXTE
+          ══════════════════════════════════════════ */}
+      <div className="hv2-content">
+
+        {/* Taglines verticales gauche */}
+        <div className={`hv2-tags-v ${entered ? 'hv2-tags-v--in' : ''}`} aria-hidden="true">
+          {['DISCIPLINE', 'FOCUS', 'PROGRESSION'].map((w, i) => (
+            <React.Fragment key={w}>
+              {i > 0 && <div className="hv2-sep-v" />}
+              <span className="hv2-tag-v">{w}</span>
             </React.Fragment>
           ))}
         </div>
 
-        {/* ── Label catégorie ── */}
-        <p className="anim-hidden anim-fade-in anim-delay-200 hero-category">
+        {/* Micro-label */}
+        <p className={`hv2-label ${entered ? 'hv2-label--in' : ''}`}>
           SPORTSWEAR · MINDSET · PREMIUM
         </p>
 
-        {/* ── Grand titre ── */}
-        <div className="anim-hidden anim-fade-in-up anim-delay-400 hero-title-wrap">
-          <h1 className="hero-title">
-            <span className="hero-title-line1">Plus qu'une</span>{' '}
-            <span className="hero-title-line1">marque,</span>{' '}
-            <span className="hero-title-line2">Un état</span>{' '}
-            <span className="hero-title-line2">d'esprit</span>
+        {/* Titre principal */}
+        <div className="hv2-title-wrap">
+          <h1 className="hv2-title">
+            <span className={`hv2-title-line hv2-line1 ${entered ? 'hv2-line--in' : ''}`}>
+              L'UNIFORME
+            </span>
+            <span className={`hv2-title-line hv2-line2 ${entered ? 'hv2-line--in' : ''}`}>
+              DU MENTAL
+            </span>
           </h1>
         </div>
 
-        {/* ── Séparateur ── */}
-        <div className="anim-hidden anim-fade-in anim-delay-600 hero-separator" />
+        {/* Ligne de séparation */}
+        <div className={`hv2-divider ${entered ? 'hv2-divider--in' : ''}`} />
 
-        {/* ── Sous-titre saison ── */}
-        <p className="anim-hidden anim-fade-in anim-delay-600 hero-season">
-          COLLECTION AUTOMNE–HIVER 2026
+        {/* Sous-titre */}
+        <p className={`hv2-subtitle ${entered ? 'hv2-subtitle--in' : ''}`}>
+          Collection Automne–Hiver 2026 &nbsp;·&nbsp; Édition limitée
         </p>
 
-        {/* ── CTA ── */}
-        <div className="anim-hidden anim-fade-in-up anim-delay-800 hero-cta-wrap">
-          <Link to="/catalog" className="hero-cta">
-            DÉCOUVRIR LA COLLECTION
-            <svg width="20" height="8" viewBox="0 0 18 7" fill="none">
-              <path d="M0 3.5H16M13 1L16.5 3.5L13 6" stroke="#FFFFFF" strokeWidth="0.85"/>
+        {/* Groupe de CTA */}
+        <div className={`hv2-cta-group ${entered ? 'hv2-cta-group--in' : ''}`}>
+          <Link to="/catalog" className="hv2-cta-primary">
+            <span>VOIR LA COLLECTION</span>
+            <svg width="18" height="7" viewBox="0 0 18 7" fill="none" aria-hidden="true">
+              <path d="M0 3.5H16M13 1L16.5 3.5L13 6" stroke="currentColor" strokeWidth="0.9"/>
             </svg>
+          </Link>
+          <Link to="/lookbook" className="hv2-cta-secondary">
+            Lookbook →
           </Link>
         </div>
 
-        {/* ── Coin bas gauche — édition ── */}
-        <p className="anim-hidden anim-fade-in anim-delay-1200 hero-edition">
-          © 2026 — VOL.01
-        </p>
-      </div>
-
-      {/* ═══════════════════════════════════════════════
-          COLONNE DROITE — image + éléments décoratifs
-          ════════════════════════════════════════════ */}
-      <div className="hero-right-col">
-        {/* Image du mannequin — fond transparent */}
-        <img
-          ref={imgRef}
-          src={heroImg}
-          alt="UB Mindset — Collection 2026"
-          className={`hero-img${imgLoaded ? ' hero-img-loaded' : ''}`}
-        />
-
-        {/* ── Taglines verticales DROITE ── */}
-        <div className="anim-hidden anim-slide-right anim-delay-800 hero-tags-right">
-          {RIGHT_TAGS.map((tag, i) => (
-            <React.Fragment key={tag}>
-              {i > 0 && <div className="hero-tag-sep hero-tag-sep-right" />}
-              <span className="hero-tag hero-tag-right">{tag}</span>
-            </React.Fragment>
+        {/* Trust bar */}
+        <div className={`hv2-trust ${entered ? 'hv2-trust--in' : ''}`} aria-live="polite">
+          {TRUST_ITEMS.map((item, i) => (
+            <span
+              key={item.label}
+              className={`hv2-trust-item ${i === trustIdx ? 'hv2-trust-item--active' : ''}`}
+              aria-hidden={i !== trustIdx}
+            >
+              <span className="hv2-trust-icon">{item.icon}</span>
+              <span className="hv2-trust-label">{item.label}</span>
+            </span>
           ))}
         </div>
 
-        {/* ── Coin bas droite ── */}
-        <p className="anim-hidden anim-fade-in anim-delay-1200 hero-dakar">
-          DAKAR · PARIS
+        {/* Label bas gauche */}
+        <p className={`hv2-edition ${entered ? 'hv2-edition--in' : ''}`} aria-hidden="true">
+          © 2026 — VOL.01 &nbsp;·&nbsp; DAKAR · PARIS
         </p>
       </div>
 
-      {/* ── Indicateur SCROLL — bas centre ── */}
+      {/* Scroll indicator */}
       <button
         onClick={scrollDown}
-        className="anim-hidden anim-fade-in anim-delay-1200 hero-scroll"
-        aria-label="Défiler vers le bas"
+        className={`hv2-scroll ${entered ? 'hv2-scroll--in' : ''}`}
+        aria-label="Défiler vers la section suivante"
       >
-        <span className="hero-scroll-label">SCROLL</span>
-        <div className="hero-scroll-line" />
+        <span className="hv2-scroll-label">SCROLL</span>
+        <div className="hv2-scroll-line" aria-hidden="true" />
       </button>
 
+      {/* ── STYLES ── */}
       <style>{`
-        /* ══════════════════════════════════════════════
-           BASE — MOBILE FIRST
-           ════════════════════════════════════════════ */
-        .hero-section {
-          position: sticky !important;
-          top: 0 !important;
-          width: 100% !important;
-          height: 100dvh !important;
-          min-height: 600px !important;
-          display: flex !important;
-          flex-direction: column !important;
-          overflow: hidden !important;
-          z-index: 1 !important;
-          background: linear-gradient(160deg, #E8E7E3 0%, #E2E1DE 45%, #D8D7D3 100%) !important;
+
+        /* ════════════════════════════════════════
+           SECTION
+           ════════════════════════════════════════ */
+        .hv2-section {
+          position: relative;
+          width: 100%;
+          height: 100dvh;
+          min-height: 620px;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          background: #E8E7E3;
         }
 
-        .hero-left-col {
-          position: relative !important;
-          width: 100% !important;
-          flex: 1 !important;
-          display: flex !important;
-          flex-direction: column !important;
-          justify-content: flex-end !important;
-          padding: 100px 28px 40px !important;
-          z-index: 3 !important;
+        /* ════════════════════════════════════════
+           IMAGE COLONNE
+           ════════════════════════════════════════ */
+        .hv2-img-col {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
         }
 
-        .hero-right-col {
-          position: absolute !important;
-          inset: 0 !important;
-          z-index: 1 !important;
-          overflow: hidden !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
+        .hv2-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center top;
+          display: block;
+          transform-origin: center top;
+          will-change: transform;
         }
 
-        .hero-img {
-          width: 100% !important;
-          height: 100% !important;
-          object-fit: contain !important;
-          object-position: center bottom !important;
-          transform: scale(0.82) translateY(70px) !important;
-          display: block !important;
+        /* Fondu vers le bas (mobile — pour lisibilité du texte overlay) */
+        .hv2-img-fade-bottom {
+          position: absolute;
+          bottom: 0; left: 0; right: 0;
+          height: 65%;
+          background: linear-gradient(
+            to top,
+            rgba(232, 231, 227, 0.98) 0%,
+            rgba(232, 231, 227, 0.80) 35%,
+            rgba(232, 231, 227, 0.30) 65%,
+            transparent 100%
+          );
+          pointer-events: none;
         }
 
-        .hero-tags-left,
-        .hero-tags-right {
-          display: none !important;
-          position: absolute !important;
-          top: 50% !important;
-          transform: translateY(-50%) !important;
-          flex-direction: column !important;
-          align-items: center !important;
-          gap: 10px !important;
-        }
-        .hero-tags-left  { left: 22px !important; }
-        .hero-tags-right { right: 18px !important; }
-
-        .hero-tag {
-          font-family: "Archivo Narrow", sans-serif !important;
-          font-weight: 600 !important;
-          font-size: 0.48rem !important;
-          text-transform: uppercase !important;
-          letter-spacing: 0.28em !important;
-          color: #8C8C8C !important;
-          writing-mode: vertical-rl !important;
-        }
-        .hero-tag-left  { transform: rotate(180deg) !important; }
-        .hero-tag-right { color: rgba(140,140,140,0.7) !important; }
-        .hero-tag-sep { width: 1px !important; height: 36px !important; background: #C4C3C0 !important; }
-        .hero-tag-sep-right { background: rgba(140,140,140,0.4) !important; }
-
-        .hero-category {
-          font-family: "Archivo Narrow", sans-serif !important;
-          font-weight: 500 !important;
-          font-size: 0.5rem !important;
-          text-transform: uppercase !important;
-          letter-spacing: 0.35em !important;
-          color: #6a6a6a !important;
-          margin-bottom: 12px !important;
+        /* Fondu vers la gauche — masqué sur mobile, visible desktop */
+        .hv2-img-fade-left {
+          display: none;
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            to right,
+            rgba(232, 231, 227, 1)    0%,
+            rgba(232, 231, 227, 0.97) 10%,
+            rgba(232, 231, 227, 0.70) 38%,
+            rgba(232, 231, 227, 0.10) 60%,
+            transparent 100%
+          );
+          pointer-events: none;
         }
 
-        .hero-title-wrap { margin-bottom: 14px !important; }
-
-        .hero-title {
-          font-family: "Archivo", sans-serif !important;
-          font-weight: 900 !important;
-          text-transform: uppercase !important;
-          color: #0A0A0A !important;
-          font-size: 3rem !important;
-          line-height: 1.05 !important;
-          letter-spacing: -0.01em !important;
-          margin-bottom: 1.5rem !important;
+        /* Badge NEW DROP */
+        .hv2-badge {
+          position: absolute;
+          top: 100px;
+          right: 20px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+          opacity: 0;
+          transform: translateY(10px);
+          transition: opacity 0.6s ease 0.9s, transform 0.6s ease 0.9s;
+        }
+        .hv2-badge--in {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .hv2-badge-text {
+          font-family: "Archivo Narrow", sans-serif;
+          font-weight: 700;
+          font-size: 0.44rem;
+          text-transform: uppercase;
+          letter-spacing: 0.38em;
+          color: #0A0A0A;
+          background: rgba(242,241,239,0.85);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          padding: 6px 10px;
+          border: 1px solid rgba(10,10,10,0.10);
+          border-radius: 2px;
+        }
+        .hv2-badge-dot {
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #0A0A0A;
+          animation: badgePulse 2s ease-in-out infinite;
+        }
+        @keyframes badgePulse {
+          0%, 100% { opacity: 0.4; transform: scale(1); }
+          50%       { opacity: 1;   transform: scale(1.4); }
         }
 
-        .hero-title-line1 {
-          color: #0A0A0A !important;
+        /* ════════════════════════════════════════
+           CONTENU TEXTE
+           ════════════════════════════════════════ */
+        .hv2-content {
+          position: relative;
+          z-index: 3;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          flex: 1;
+          padding: 104px 24px 100px;
         }
 
-        .hero-title-line2 {
-          color: #6B6B6B !important;
+        /* Taglines verticales */
+        .hv2-tags-v {
+          display: none;
+          position: absolute;
+          left: 22px;
+          top: 50%;
+          transform: translateY(-50%);
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          opacity: 0;
+          transition: opacity 0.6s ease 1.1s;
+        }
+        .hv2-tags-v--in { opacity: 1; }
+
+        .hv2-tag-v {
+          font-family: "Archivo Narrow", sans-serif;
+          font-weight: 600;
+          font-size: 0.44rem;
+          text-transform: uppercase;
+          letter-spacing: 0.28em;
+          color: #8C8C8C;
+          writing-mode: vertical-rl;
+          transform: rotate(180deg);
+        }
+        .hv2-sep-v {
+          width: 1px;
+          height: 32px;
+          background: #C4C3C0;
+          flex-shrink: 0;
         }
 
-        .hero-separator { width: 32px !important; height: 1px !important; background: #C4C3C0 !important; margin-bottom: 12px !important; }
-
-        .hero-season {
-          font-family: "Archivo Narrow", sans-serif !important;
-          font-weight: 500 !important;
-          font-size: 0.6rem !important;
-          text-transform: uppercase !important;
-          letter-spacing: 0.3em !important;
-          color: #6a6a6a !important;
-          margin-bottom: 20px !important;
+        /* Micro-label */
+        .hv2-label {
+          font-family: "Archivo Narrow", sans-serif;
+          font-weight: 500;
+          font-size: 0.5rem;
+          text-transform: uppercase;
+          letter-spacing: 0.36em;
+          color: #6A6A6A;
+          margin-bottom: 14px;
+          opacity: 0;
+          transform: translateY(8px);
+          transition: opacity 0.5s ease 0.15s, transform 0.5s ease 0.15s;
+        }
+        .hv2-label--in {
+          opacity: 1;
+          transform: translateY(0);
         }
 
-        .hero-cta-wrap { display: inline-block !important; }
+        /* Titre */
+        .hv2-title-wrap { margin-bottom: 18px; overflow: hidden; }
 
-        .hero-cta {
-          display: inline-flex !important;
-          align-items: center !important;
-          gap: 14px !important;
-          text-decoration: none !important;
-          color: #FFFFFF !important;
-          font-family: "Archivo Narrow", sans-serif !important;
-          font-weight: 700 !important;
-          font-size: 1rem !important;
-          letter-spacing: 0.3em !important;
-          text-transform: uppercase !important;
-          padding: 18px 32px !important;
-          background: #000000 !important;
-          border: none !important;
-          border-radius: 2px !important;
-          transition: background 0.3s ease, gap 0.3s ease, transform 0.2s ease !important;
-        }
-        .hero-cta:hover {
-          background: #2A2A2A !important;
-          gap: 22px !important;
-          transform: translateY(-2px) !important;
+        .hv2-title {
+          font-family: "Archivo", sans-serif;
+          font-weight: 900;
+          text-transform: uppercase;
+          line-height: 0.95;
+          letter-spacing: -0.02em;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
         }
 
-        .hero-edition,
-        .hero-dakar { display: none !important; }
-
-        .hero-edition {
-          position: absolute !important;
-          bottom: 28px !important;
-          left: 80px !important;
-          font-family: "Archivo Narrow", sans-serif !important;
-          font-size: 0.48rem !important;
-          font-weight: 500 !important;
-          text-transform: uppercase !important;
-          letter-spacing: 0.28em !important;
-          color: #C4C3C0 !important;
+        .hv2-title-line {
+          display: block;
+          opacity: 0;
+          transform: translateY(100%);
+          transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
         }
-        .hero-dakar {
-          position: absolute !important;
-          bottom: 28px !important;
-          right: 36px !important;
-          font-family: "Archivo Narrow", sans-serif !important;
-          font-size: 0.48rem !important;
-          font-weight: 500 !important;
-          text-transform: uppercase !important;
-          letter-spacing: 0.28em !important;
-          color: rgba(140,140,140,0.6) !important;
-          text-align: right !important;
+        .hv2-line1 {
+          font-size: clamp(2.8rem, 10vw, 3.2rem);
+          color: #0A0A0A;
+          transition-delay: 0.25s;
+        }
+        .hv2-line2 {
+          font-size: clamp(2.8rem, 10vw, 3.2rem);
+          color: #5A5A5A;
+          transition-delay: 0.38s;
+        }
+        .hv2-line--in {
+          opacity: 1;
+          transform: translateY(0);
         }
 
-        .hero-scroll {
-          position: absolute !important;
-          bottom: 16px !important;
-          left: 50% !important;
-          transform: translateX(-50%) !important;
-          display: flex !important;
-          flex-direction: column !important;
-          align-items: center !important;
-          gap: 8px !important;
-          background: none !important;
-          border: none !important;
-          cursor: pointer !important;
-          z-index: 10 !important;
+        /* Diviseur */
+        .hv2-divider {
+          width: 0;
+          height: 1px;
+          background: #C4C3C0;
+          margin-bottom: 14px;
+          transition: width 0.7s cubic-bezier(0.16,1,0.3,1) 0.55s;
         }
-        .hero-scroll-label {
-          font-family: "Archivo Narrow", sans-serif !important;
-          font-size: 0.44rem !important;
-          font-weight: 600 !important;
-          text-transform: uppercase !important;
-          letter-spacing: 0.35em !important;
-          color: rgba(100,100,100,0.6) !important;
+        .hv2-divider--in { width: 36px; }
+
+        /* Sous-titre */
+        .hv2-subtitle {
+          font-family: "Archivo Narrow", sans-serif;
+          font-weight: 500;
+          font-size: 0.56rem;
+          text-transform: uppercase;
+          letter-spacing: 0.28em;
+          color: #6A6A6A;
+          margin-bottom: 26px;
+          opacity: 0;
+          transition: opacity 0.5s ease 0.6s;
         }
-        .hero-scroll-line {
-          width: 1px !important;
-          height: 28px !important;
-          background: rgba(100,100,100,0.35) !important;
-          animation: scrollPulse 2.2s ease-in-out infinite !important;
+        .hv2-subtitle--in { opacity: 1; }
+
+        /* Groupe CTA */
+        .hv2-cta-group {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          margin-bottom: 28px;
+          opacity: 0;
+          transform: translateY(14px);
+          transition: opacity 0.6s ease 0.7s, transform 0.6s cubic-bezier(0.16,1,0.3,1) 0.7s;
+        }
+        .hv2-cta-group--in {
+          opacity: 1;
+          transform: translateY(0);
         }
 
-        /* ══════════════════════════════════════════════
-           PETIT MOBILE — ≤480px
-           ════════════════════════════════════════════ */
-        @media (max-width: 480px) {
-          .hero-left-col { padding: 90px 20px 32px !important; }
-          .hero-title { font-size: 2.4rem !important; }
+        /* CTA primaire */
+        .hv2-cta-primary {
+          display: inline-flex;
+          align-items: center;
+          gap: 14px;
+          text-decoration: none;
+          color: #F2F1EF;
+          font-family: "Archivo Narrow", sans-serif;
+          font-weight: 700;
+          font-size: 0.72rem;
+          letter-spacing: 0.28em;
+          text-transform: uppercase;
+          padding: 16px 28px;
+          background: #0A0A0A;
+          border-radius: 2px;
+          border: none;
+          align-self: flex-start;
+          transition: background 0.25s ease, gap 0.3s ease, transform 0.2s ease;
+        }
+        .hv2-cta-primary:hover {
+          background: #2A2A2A;
+          gap: 22px;
+          transform: translateY(-2px);
+        }
+        .hv2-cta-primary:active {
+          transform: scale(0.97);
         }
 
-        /* ══════════════════════════════════════════════
+        /* CTA secondaire */
+        .hv2-cta-secondary {
+          display: inline-block;
+          text-decoration: none;
+          color: #6A6A6A;
+          font-family: "Archivo Narrow", sans-serif;
+          font-weight: 500;
+          font-size: 0.6rem;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          transition: color 0.2s ease;
+        }
+        .hv2-cta-secondary:hover { color: #0A0A0A; }
+
+        /* Trust bar */
+        .hv2-trust {
+          position: relative;
+          height: 20px;
+          margin-bottom: 32px;
+          opacity: 0;
+          transition: opacity 0.5s ease 0.85s;
+        }
+        .hv2-trust--in { opacity: 1; }
+
+        .hv2-trust-item {
+          position: absolute;
+          top: 0; left: 0;
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          opacity: 0;
+          transform: translateY(4px);
+          transition: opacity 0.4s ease, transform 0.4s ease;
+          pointer-events: none;
+          white-space: nowrap;
+        }
+        .hv2-trust-item--active {
+          opacity: 1;
+          transform: translateY(0);
+          pointer-events: auto;
+        }
+
+        .hv2-trust-icon {
+          font-size: 0.6rem;
+          color: #8C8C8C;
+        }
+        .hv2-trust-label {
+          font-family: "Archivo Narrow", sans-serif;
+          font-weight: 500;
+          font-size: 0.5rem;
+          text-transform: uppercase;
+          letter-spacing: 0.28em;
+          color: #8C8C8C;
+        }
+
+        /* Label édition */
+        .hv2-edition {
+          position: absolute;
+          bottom: 28px;
+          left: 24px;
+          font-family: "Archivo Narrow", sans-serif;
+          font-size: 0.44rem;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.28em;
+          color: #C4C3C0;
+          opacity: 0;
+          transition: opacity 0.5s ease 1s;
+        }
+        .hv2-edition--in { opacity: 1; }
+
+        /* ════════════════════════════════════════
+           SCROLL INDICATOR
+           ════════════════════════════════════════ */
+        .hv2-scroll {
+          position: absolute;
+          bottom: 22px;
+          left: 50%;
+          transform: translateX(-50%) translateY(6px);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          z-index: 10;
+          opacity: 0;
+          transition: opacity 0.5s ease 1.1s, transform 0.5s ease 1.1s;
+        }
+        .hv2-scroll--in {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+        .hv2-scroll-label {
+          font-family: "Archivo Narrow", sans-serif;
+          font-size: 0.42rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.35em;
+          color: rgba(100,100,100,0.55);
+        }
+        .hv2-scroll-line {
+          width: 1px;
+          height: 28px;
+          background: rgba(100,100,100,0.30);
+          animation: hv2ScrollPulse 2.2s ease-in-out infinite;
+        }
+        @keyframes hv2ScrollPulse {
+          0%, 100% { opacity: 0.4; transform: scaleY(1); }
+          50%       { opacity: 1;   transform: scaleY(1.25); }
+        }
+
+        /* ════════════════════════════════════════
            TABLETTE — 769px à 1024px
-           ════════════════════════════════════════════ */
+           ════════════════════════════════════════ */
         @media (min-width: 769px) and (max-width: 1024px) {
-          .hero-section { flex-direction: row !important; }
-          .hero-left-col { width: 68% !important; flex-shrink: 0 !important; padding: 0 40px 60px 56px !important; }
-          .hero-right-col { position: relative !important; flex: 1 !important; inset: auto !important; }
-          .hero-img { object-position: center center !important; }
-          .hero-title { font-size: 4.5rem !important; line-height: 0.92 !important; }
-          .hero-category { font-size: 0.56rem !important; color: #8C8C8C !important; margin-bottom: 20px !important; }
-          .hero-season { font-size: 0.54rem !important; color: #8C8C8C !important; margin-bottom: 32px !important; }
-          .hero-cta { font-size: 1.1rem !important; }
-          .hero-edition { display: block !important; left: 56px !important; }
-          .hero-dakar { display: block !important; }
-          .hero-scroll { left: 47% !important; bottom: 28px !important; }
-          .hero-scroll-label { font-size: 0.48rem !important; color: #8C8C8C !important; }
-          .hero-scroll-line { height: 32px !important; background: #C4C3C0 !important; }
+          .hv2-section {
+            flex-direction: row;
+          }
+          .hv2-img-col {
+            position: relative;
+            inset: auto;
+            flex: 1;
+            order: 2;
+          }
+          .hv2-img-fade-bottom { display: none; }
+          .hv2-img-fade-left { display: block; order: 2; }
+          .hv2-img {
+            height: 100dvh;
+            object-position: center top;
+            transform: scale(1.06) translateY(0);
+          }
+          .hv2-content {
+            order: 1;
+            width: 55%;
+            flex-shrink: 0;
+            padding: 0 40px 70px 52px;
+            justify-content: center;
+          }
+          .hv2-line1, .hv2-line2 {
+            font-size: clamp(3.4rem, 5vw, 4.2rem);
+          }
+          .hv2-badge { top: 90px; right: auto; left: 58%; }
+          .hv2-cta-group { flex-direction: row; align-items: center; }
+          .hv2-edition { left: 52px; }
+          .hv2-scroll { left: 48%; }
+          .hv2-tags-v { display: flex; }
         }
 
-        /* ══════════════════════════════════════════════
+        /* ════════════════════════════════════════
            DESKTOP — ≥1025px
-           ════════════════════════════════════════════ */
+           ════════════════════════════════════════ */
         @media (min-width: 1025px) {
-          .hero-section { flex-direction: row !important; }
-          .hero-left-col { width: 65% !important; flex-shrink: 0 !important; padding: 0 56px 80px 80px !important; }
-          .hero-right-col { position: relative !important; flex: 1 !important; inset: auto !important; }
-          .hero-tags-left, .hero-tags-right { display: flex !important; }
-          .hero-title { font-size: 4rem !important; }
-          .hero-category { font-size: 0.56rem !important; color: #8C8C8C !important; }
-          .hero-season { font-size: 0.54rem !important; color: #8C8C8C !important; }
-          .hero-cta { font-size: 1.05rem !important; }
-          .hero-edition, .hero-dakar { display: block !important; }
-          .hero-scroll { left: 47% !important; bottom: 28px !important; }
-          .hero-scroll-label { font-size: 0.48rem !important; color: #8C8C8C !important; }
-          .hero-scroll-line { height: 32px !important; background: #C4C3C0 !important; }
+          .hv2-section {
+            flex-direction: row;
+          }
+          .hv2-img-col {
+            position: relative;
+            inset: auto;
+            flex: 1;
+            order: 2;
+          }
+          .hv2-img-fade-bottom { display: none; }
+          .hv2-img-fade-left {
+            display: block;
+          }
+          .hv2-img {
+            height: 100dvh;
+            object-position: center top;
+            transform: scale(1.06) translateY(0);
+          }
+          .hv2-content {
+            order: 1;
+            width: 58%;
+            flex-shrink: 0;
+            padding: 0 60px 80px 88px;
+            justify-content: center;
+          }
+          .hv2-line1, .hv2-line2 {
+            font-size: clamp(4rem, 5.5vw, 5.5rem);
+          }
+          .hv2-badge {
+            top: 110px;
+            right: auto;
+            left: 61%;
+          }
+          .hv2-cta-group {
+            flex-direction: row;
+            align-items: center;
+            gap: 28px;
+          }
+          .hv2-tags-v { display: flex; }
+          .hv2-edition { left: 88px; }
+          .hv2-scroll { left: 47%; }
         }
 
-        /* ══════════════════════════════════════════════
-           ACCESSIBILITÉ — reduced motion
-           ════════════════════════════════════════════ */
+        /* ════════════════════════════════════════
+           PETIT MOBILE — ≤ 480px
+           ════════════════════════════════════════ */
+        @media (max-width: 480px) {
+          .hv2-line1, .hv2-line2 {
+            font-size: clamp(2.4rem, 9vw, 2.8rem);
+          }
+          .hv2-content {
+            padding: 96px 20px 90px;
+          }
+          .hv2-cta-primary {
+            width: 100%;
+            justify-content: center;
+          }
+        }
+
+        /* ════════════════════════════════════════
+           REDUCED MOTION
+           ════════════════════════════════════════ */
         @media (prefers-reduced-motion: reduce) {
-          .hero-scroll-line { animation: none !important; }
-          .anim-fade-in, .anim-fade-in-up, .anim-slide-left, .anim-slide-right {
-            animation-duration: 0.01ms !important;
-            animation-delay: 0ms !important;
-          }
-        }
-
-        /* ════════════════════════════════════════════════════════════
-           MOBILE — ≤768px  (surcharges uniquement, desktop intact)
-           ════════════════════════════════════════════════════════════ */
-        @media (max-width: 768px) {
-
-          /* ── 1. Structure empilée : nav → titre → photo → CTA ── */
-          .hero-section {
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: flex-start !important;
-            padding-top: 84px !important;
-          }
-
-          .hero-left-col {
-            display: contents !important;
-          }
-
-          /* Ordre : category/titre/séparateur/saison (1) → photo (2) → CTA (3) */
-          .hero-category,
-          .hero-title-wrap,
-          .hero-separator,
-          .hero-season {
-            order: 1 !important;
-            width: 100% !important;
-            padding-left: 24px !important;
-            padding-right: 24px !important;
-          }
-
-          .hero-right-col {
-            order: 2 !important;
-            position: relative !important;
-            inset: auto !important;
-            width: 100% !important;
-            height: 32vh !important;
-            min-height: 200px !important;
-            flex: none !important;
-            overflow: hidden !important;
-          }
-
-          .hero-cta-wrap {
-            order: 3 !important;
-            padding: 0 24px !important;
-            margin-top: 18px !important;
-          }
-
-          .hero-edition { display: none !important; }
-
-          /* ── 5. Mots verticaux : masqués proprement ── */
-          .hero-tags-left,
-          .hero-tags-right { display: none !important; }
-
-          /* ── 2. Titre réduit, 2 lignes, contraste noir/gris ── */
-          .hero-title {
-            font-size: 2.05rem !important;
-            line-height: 1.12 !important;
-            letter-spacing: -0.01em !important;
-            margin-bottom: 14px !important;
-          }
-          .hero-title-line1,
-          .hero-title-line2 { display: block !important; }
-          .hero-title-line1 { color: #0A0A0A !important; }
-          .hero-title-line2 { color: #6B6B6B !important; }
-
-          .hero-category { font-size: 0.5rem !important; margin-bottom: 8px !important; }
-          .hero-separator { margin-bottom: 10px !important; }
-          .hero-season { font-size: 0.55rem !important; margin-bottom: 0 !important; }
-
-          /* ── 4. CTA tactile (min 48px, effet de pression) ── */
-          .hero-cta {
-            display: flex !important;
-            width: 100% !important;
-            justify-content: center !important;
-            min-height: 52px !important;
-            padding: 16px 24px !important;
-            font-size: 0.9rem !important;
-            -webkit-tap-highlight-color: transparent !important;
-            touch-action: manipulation !important;
-          }
-          .hero-cta:active {
-            transform: scale(0.96) !important;
-            background: #2a2a2a !important;
-          }
-
-          /* ── 3. Animations d'entrée (0.6–0.8s, transform/opacity uniquement) ── */
-
-          /* Désactive les animations globales (anim-hidden, anim-fade-in, etc.) */
-          .hero-section .anim-hidden,
-          .hero-section .anim-fade-in,
-          .hero-section .anim-fade-in-up,
-          .hero-section .anim-slide-left,
-          .hero-section .anim-slide-right {
-            animation: none !important;
-            animation-delay: 0ms !important;
-            opacity: 1 !important;
-          }
-
-          /* Les conteneurs parents ne doivent pas rester invisibles */
-          .hero-title-wrap,
-          .hero-cta-wrap {
-            opacity: 1 !important;
-            transform: none !important;
-          }
-
-          /* Titre : forcé visible (les animations globales anim-hidden/anim-fade-in-up
-             de index.css maintenaient opacity:0 pendant 1.4-2.2s et empêchaient l'affichage) */
-          .hero-title-line1,
-          .hero-title-line2 {
-            opacity: 1 !important;
+          .hv2-title-line,
+          .hv2-label,
+          .hv2-subtitle,
+          .hv2-divider,
+          .hv2-cta-group,
+          .hv2-trust,
+          .hv2-badge,
+          .hv2-edition,
+          .hv2-tags-v,
+          .hv2-scroll {
+            transition: none !important;
             animation: none !important;
           }
-
-          /* Blocs secondaires : fade simple */
-          .hero-category,
-          .hero-separator,
-          .hero-season {
-            opacity: 0 !important;
-            animation: heroFadeIn 0.45s ease forwards !important;
-          }
-          .hero-category  { animation-delay: 0.05s !important; }
-          .hero-separator { animation-delay: 0.3s !important; }
-          .hero-season    { animation-delay: 0.3s !important; }
-
-          /* Photo : fade + léger zoom-out */
-          .hero-img {
-            transform: scale(1.08) !important;
-            opacity: 0 !important;
-            transition:
-              transform 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.35s,
-              opacity 0.45s ease 0.35s !important;
-            will-change: transform, opacity !important;
-          }
-          .hero-img.hero-img-loaded {
-            transform: scale(1) translateY(0) !important;
-            opacity: 1 !important;
-          }
-
-          /* CTA : apparition en dernier avec léger rebond */
-          .hero-cta-wrap {
-            opacity: 0 !important;
-            animation: heroCtaPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.55s forwards !important;
-          }
-
-          /* Indicateur SCROLL */
-          .hero-scroll {
-            bottom: 14px !important;
-            opacity: 0 !important;
-            animation: heroFadeIn 0.4s ease 0.75s forwards !important;
-          }
-
-          /* Keyframes mobiles */
-          @keyframes heroLineUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to   { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes heroFadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-          }
-          @keyframes heroCtaPop {
-            from { opacity: 0; transform: translateY(12px) scale(0.94); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
-          }
-
-          /* Reduced motion */
-          @media (prefers-reduced-motion: reduce) {
-            .hero-title-line1,
-            .hero-title-line2,
-            .hero-category,
-            .hero-separator,
-            .hero-season,
-            .hero-cta-wrap,
-            .hero-scroll,
-            .hero-img {
-              animation-duration: 0.01ms !important;
-              animation-delay: 0ms !important;
-              transition-duration: 0.01ms !important;
-            }
-          }
+          .hv2-title-line { opacity: 1 !important; transform: none !important; }
+          .hv2-label--in,
+          .hv2-subtitle--in,
+          .hv2-cta-group--in,
+          .hv2-trust--in,
+          .hv2-badge--in,
+          .hv2-edition--in,
+          .hv2-tags-v--in,
+          .hv2-scroll--in { opacity: 1 !important; transform: translateX(-50%) !important; }
+          .hv2-divider--in { width: 36px !important; }
+          .hv2-scroll-line { animation: none !important; }
+          .hv2-badge-dot { animation: none !important; }
+          .hv2-trust-item { transition: none !important; }
         }
 
       `}</style>
