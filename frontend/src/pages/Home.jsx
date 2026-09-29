@@ -1,6 +1,7 @@
 import React from 'react';
 import Hero from '../components/Hero';
 import Marquee from '../components/Marquee';
+import NewArrivals from '../components/NewArrivals';
 import Collection from '../components/Collection';
 
 export default function Home() {
@@ -11,6 +12,9 @@ export default function Home() {
 
       {/* ── BANDE DÉFILANTE ── */}
       <Marquee />
+
+      {/* ── NOUVEAUTÉS ── */}
+      <NewArrivals />
 
       {/* ── COLLECTION ── */}
       <Collection />
