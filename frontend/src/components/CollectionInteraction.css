@@ -1,0 +1,44 @@
+/* Interactions de rails : scroll natif tactile/trackpad, drag souris, snap discret. */
+.collection-rail__track {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  scroll-snap-type: x proximity !important;
+  scroll-behavior: smooth;
+  cursor: grab;
+  overscroll-behavior-x: contain;
+}
+
+/* Empêche le parent de s'étirer à la largeur cumulée des cartes. */
+.collection-section__rails,
+.collection-rail,
+.collection-rail__viewport {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.collection-rail__viewport {
+  margin-inline: auto;
+  overflow: hidden;
+  width: min(100%, 1280px);
+}
+
+.collection-rail__track.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.collection-rail__track .collection-card {
+  /* À six cartes, cette largeur garantit un débordement sur desktop : le rail reste donc réellement navigable. */
+  flex: 0 0 clamp(310px, 30vw, 390px) !important;
+  scroll-snap-align: start;
+}
+
+.collection-heading-space { display: inline; }
+
+@media (max-width: 768px) {
+  .collection-rail__track { cursor: auto; }
+  .collection-rail__track .collection-card { flex-basis: 67vw !important; }
+  .collection-heading-space { display: none; }
+}

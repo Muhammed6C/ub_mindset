@@ -7,6 +7,8 @@ export const COLLECTION_CATEGORIES = [
       { id: 6, name: 'SHORT TRAINING', subtitle: 'Dry-fit — Poche zippée', price: '75 €', tag: 'ÉDITION LTD.', image: '/demo-collection2.webp', sizes: ['S', 'M', 'L', 'XL'] },
       { id: 'foot-demo-01', name: 'UB-FOOT — APERÇU 01', subtitle: 'IMAGE DÉMO — À REMPLACER', tag: 'APERÇU', image: '/demo-collection.webp', demo: true },
       { id: 'foot-demo-02', name: 'UB-FOOT — APERÇU 02', subtitle: 'IMAGE DÉMO — À REMPLACER', tag: 'APERÇU', image: '/demo-collection2.webp', demo: true },
+      { id: 'foot-demo-03', name: 'UB-FOOT — APERÇU 03', subtitle: 'IMAGE DÉMO — À REMPLACER', tag: 'APERÇU', image: '/demo-collection.webp', demo: true },
+      { id: 'foot-demo-04', name: 'UB-FOOT — APERÇU 04', subtitle: 'IMAGE DÉMO — À REMPLACER', tag: 'APERÇU', image: '/demo-collection2.webp', demo: true },
     ],
   },
   {
@@ -17,6 +19,7 @@ export const COLLECTION_CATEGORIES = [
       { id: 5, name: 'SWEAT OVERSIZED', subtitle: 'French terry 300g — Col montant', price: '120 €', image: '/demo-collection.webp', sizes: ['S', 'M', 'L', 'XL'] },
       { id: 'basket-demo-01', name: 'UB-BASKET — APERÇU 01', subtitle: 'IMAGE DÉMO — À REMPLACER', tag: 'APERÇU', image: '/demo-collection2.webp', demo: true },
       { id: 'basket-demo-02', name: 'UB-BASKET — APERÇU 02', subtitle: 'IMAGE DÉMO — À REMPLACER', tag: 'APERÇU', image: '/demo-collection.webp', demo: true },
+      { id: 'basket-demo-03', name: 'UB-BASKET — APERÇU 03', subtitle: 'IMAGE DÉMO — À REMPLACER', tag: 'APERÇU', image: '/demo-collection2.webp', demo: true },
     ],
   },
   {
@@ -26,6 +29,8 @@ export const COLLECTION_CATEGORIES = [
       { id: 'lift-demo-01', name: 'UB-LIFT — APERÇU 01', subtitle: 'IMAGE DÉMO — À REMPLACER', tag: 'APERÇU', image: '/demo-collection2.webp', demo: true },
       { id: 'lift-demo-02', name: 'UB-LIFT — APERÇU 02', subtitle: 'IMAGE DÉMO — À REMPLACER', tag: 'APERÇU', image: '/demo-collection.webp', demo: true },
       { id: 'lift-demo-03', name: 'UB-LIFT — APERÇU 03', subtitle: 'IMAGE DÉMO — À REMPLACER', tag: 'APERÇU', image: '/demo-collection2.webp', demo: true },
+      { id: 'lift-demo-04', name: 'UB-LIFT — APERÇU 04', subtitle: 'IMAGE DÉMO — À REMPLACER', tag: 'APERÇU', image: '/demo-collection.webp', demo: true },
+      { id: 'lift-demo-05', name: 'UB-LIFT — APERÇU 05', subtitle: 'IMAGE DÉMO — À REMPLACER', tag: 'APERÇU', image: '/demo-collection2.webp', demo: true },
     ],
   },
 ];

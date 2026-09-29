@@ -7,6 +7,7 @@ import Blog from './pages/Blog';
 import TryOn from './pages/TryOn';
 import Lookbook from './pages/Lookbook';
 import OurStory from './pages/OurStory';
+import Catalog from './pages/Catalog';
 import { useCart } from './context/CartContext';
 
 // Pages à construire dans les prochaines étapes
@@ -49,7 +50,7 @@ function Storefront() {
       <Routes>
         <Route path="/"          element={<Home />} />
         <Route path="/blog"      element={<Blog />} />
-        <Route path="/catalog"   element={<ComingSoon label="CATALOGUE" />} />
+        <Route path="/catalog"   element={<Catalog />} />
         <Route path="/lookbook"  element={<Lookbook />} />
         <Route path="/notre-histoire" element={<OurStory />} />
         <Route path="/about"     element={<OurStory />} />
