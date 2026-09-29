@@ -568,15 +568,31 @@ export default function Hero() {
            MOBILE — ≤768px
            ════════════════════════════════════════ */
         @media (max-width: 768px) {
+          .hv2-section {
+            height: max(100svh, 720px) !important;
+            min-height: 720px !important;
+          }
+          /* L'image garde une zone propre : le titre ne recouvre plus le logo du vêtement. */
+          .hv2-img-col {
+            bottom: auto !important;
+            height: 58% !important;
+          }
           .hv2-img {
-            object-position: center 6% !important;
+            object-position: center 8% !important;
           }
           .hv2-img-fade-bottom {
-            height: 56% !important;
+            height: 40% !important;
+            background: linear-gradient(
+              to top,
+              #E8E7E3 0%,
+              rgba(232, 231, 227, 0.86) 45%,
+              rgba(232, 231, 227, 0) 100%
+            ) !important;
           }
           .hv2-content {
             justify-content: flex-end !important;
-            padding: 84px 20px 58px !important;
+            padding: 0 20px max(104px, calc(72px + env(safe-area-inset-bottom))) !important;
+            padding-top: 52svh !important;
           }
           .hv2-title-wrap {
             margin-bottom: 12px !important;
@@ -695,14 +711,20 @@ export default function Hero() {
            PETIT MOBILE — ≤ 480px
            ════════════════════════════════════════ */
         @media (max-width: 480px) {
+          .hv2-section {
+            height: max(100svh, 680px) !important;
+            min-height: 680px !important;
+          }
+          .hv2-img-col { height: 56% !important; }
           .hv2-img {
-            object-position: center 4% !important;
+            object-position: center 7% !important;
           }
           .hv2-line1, .hv2-line2 {
             font-size: clamp(2.3rem, 8.5vw, 2.7rem);
           }
           .hv2-content {
-            padding: 80px 18px 52px !important;
+            padding: 0 18px max(96px, calc(68px + env(safe-area-inset-bottom))) !important;
+            padding-top: 49svh !important;
           }
           .hv2-cta-group {
             flex-direction: row !important;

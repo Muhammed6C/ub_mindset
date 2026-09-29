@@ -491,17 +491,19 @@ export default function Navbar({ cartCount = 0 }) {
         className="flex md:hidden"
         style={{
           position: 'fixed',
-          bottom: '8px',
-          left: '8px',
-          right: '8px',
+          bottom: 'max(10px, env(safe-area-inset-bottom))',
+          left: '12px',
+          right: '12px',
           zIndex: 100,
           justifyContent: 'space-around',
-          padding: '8px 16px calc(8px + env(safe-area-inset-bottom))',
-          background: 'rgba(255, 255, 255, 0.45)',
-          backdropFilter: 'blur(40px) saturate(200%)',
-          borderRadius: '44px',
-          border: '1px solid rgba(255, 255, 255, 0.5)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 -1px 0 rgba(0, 0, 0, 0.03)',
+          minHeight: '68px',
+          padding: '7px 10px',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.72), rgba(242,241,239,0.48))',
+          backdropFilter: 'blur(28px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(28px) saturate(180%)',
+          borderRadius: '26px',
+          border: '1px solid rgba(255, 255, 255, 0.78)',
+          boxShadow: '0 14px 36px rgba(10, 10, 10, 0.18), 0 2px 8px rgba(10, 10, 10, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.92), inset 0 -1px 0 rgba(10, 10, 10, 0.05)',
         }}
       >
         {[
@@ -521,21 +523,26 @@ export default function Navbar({ cartCount = 0 }) {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '3px',
+                gap: '4px',
                 textDecoration: 'none',
                 color: isActive ? '#0A0A0A' : '#8C8C8C',
                 fontWeight: isActive ? 700 : 500,
-                fontSize: '0.55rem',
+                fontSize: '0.52rem',
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                minWidth: '56px',
-                transition: 'color 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
-                transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                minWidth: '64px',
+                minHeight: '52px',
+                justifyContent: 'center',
+                borderRadius: '18px',
+                background: isActive ? 'rgba(255, 255, 255, 0.58)' : 'transparent',
+                boxShadow: isActive ? 'inset 0 1px 0 rgba(255,255,255,0.82), 0 2px 8px rgba(10,10,10,0.06)' : 'none',
+                transition: 'color 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s ease, box-shadow 0.3s ease',
+                transform: isActive ? 'translateY(-1px)' : 'translateY(0)',
               }}
             >
               <svg
-                width="18"
-                height="18"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill={isActive ? '#0A0A0A' : 'none'}
                 stroke={isActive ? '#0A0A0A' : '#8C8C8C'}

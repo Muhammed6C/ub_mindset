@@ -1,0 +1,25 @@
+/* Ajustements de composition qui restent séparés du socle des rails. */
+@media (min-width: 1025px) {
+  .collection-section__header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 230px;
+  }
+
+  .collection-section__header h2 {
+    font-size: clamp(3.8rem, 5.35vw, 6.1rem);
+    letter-spacing: -0.085em;
+    white-space: nowrap;
+  }
+
+  .collection-section__header h2 br { display: none; }
+
+  .collection-section__header > span {
+    border-left: none;
+    margin: 26px 0 0;
+    padding: 0;
+    max-width: 360px;
+    text-align: left;
+  }
+}

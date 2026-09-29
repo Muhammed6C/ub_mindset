@@ -11,15 +11,19 @@ const ITEMS = [
 ];
 
 export default function Marquee() {
-  /* Duplique la liste pour une boucle fluide sans coupure */
-  const loop = [...ITEMS, ...ITEMS];
+  const renderItems = (group) => ITEMS.map((item) => (
+    <span className="marquee-item" key={`${group}-${item}`}>
+      <span className="marquee-text">{item}</span>
+      <img className="marquee-logo" src="/only-ub.png" alt="" aria-hidden="true" />
+    </span>
+  ));
 
   return (
     <section
       className="marquee-section"
       style={{
         background: '#0A0A0A',
-        height: '60px',
+        height: '64px',
         display: 'flex',
         alignItems: 'center',
         overflow: 'hidden',
@@ -28,12 +32,8 @@ export default function Marquee() {
       aria-hidden="true"
     >
       <div className="marquee-track">
-        {loop.map((item, i) => (
-          <span className="marquee-item" key={i}>
-            <span className="marquee-text" style={{ color: '#F2F1EF' }}>{item}</span>
-            <span className="marquee-star" style={{ color: '#8C8C8C' }}>✦</span>
-          </span>
-        ))}
+        <div className="marquee-group">{renderItems('first')}</div>
+        <div className="marquee-group" aria-hidden="true">{renderItems('second')}</div>
       </div>
 
       <style>{`
@@ -42,31 +42,40 @@ export default function Marquee() {
           align-items: center;
           width: max-content;
           flex-shrink: 0;
-          animation: marqueeScroll 30s linear infinite;
+          animation: marqueeScroll 34s linear infinite;
           will-change: transform;
+        }
+
+        .marquee-group {
+          display: flex;
+          align-items: center;
+          flex-shrink: 0;
         }
 
         .marquee-item {
           display: flex;
           align-items: center;
           flex-shrink: 0;
-          padding: 0 18px;
+          gap: 24px;
+          padding: 0 24px;
         }
 
         .marquee-text {
           font-family: "Archivo Narrow", sans-serif;
-          font-weight: 500;
-          font-size: '0.75rem';
+          font-weight: 600;
+          font-size: 0.72rem;
           text-transform: uppercase;
-          letter-spacing: '0.3em';
-          color: '#F2F1EF';
+          letter-spacing: 0.2em;
+          color: #FFFFF0;
           white-space: nowrap;
-          padding: '0 36px';
         }
 
-        .marquee-star {
-          font-size: '0.55rem';
-          color: '#8C8C8C';
+        .marquee-logo {
+          width: 22px;
+          height: 22px;
+          object-fit: contain;
+          filter: invert(1) brightness(1.4);
+          opacity: 0.82;
           flex-shrink: 0;
         }
 
@@ -83,15 +92,19 @@ export default function Marquee() {
         /* Mobile — hauteur et taille réduites */
         @media (max-width: 768px) {
           .marquee-section {
-            height: '46px' !important;
+            height: 50px !important;
           }
           .marquee-text {
-            font-size: '0.6rem' !important;
-            letter-spacing: '0.25em' !important;
-            padding: '0 24px' !important;
+            font-size: 0.6rem !important;
+            letter-spacing: 0.16em !important;
           }
-          .marquee-star {
-            font-size: '0.45rem' !important;
+          .marquee-item {
+            gap: 18px;
+            padding: 0 18px;
+          }
+          .marquee-logo {
+            width: 18px;
+            height: 18px;
           }
         }
 
