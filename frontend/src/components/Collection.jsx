@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 /* ─────────────────────────────────────────────────────────
    UB MINDSET — COLLECTION V2
@@ -21,6 +22,7 @@ const PRODUCTS = [
     originalPrice: null,
     tag: 'BEST-SELLER',
     tagColor: '#0A0A0A',
+    image: '/demo-collection.webp',
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
     bg: ['#DDDCD8', '#D0CFCB'],
     accent: '#8C8C8C',
@@ -35,6 +37,7 @@ const PRODUCTS = [
     originalPrice: null,
     tag: 'NOUVEAU',
     tagColor: '#2A2A2A',
+    image: '/demo-collection2.webp',
     sizes: ['S', 'M', 'L', 'XL'],
     bg: ['#E2E1DC', '#D8D7D2'],
     accent: '#6A6A6A',
@@ -49,6 +52,7 @@ const PRODUCTS = [
     originalPrice: null,
     tag: null,
     tagColor: null,
+    image: '/demo-collection.webp',
     sizes: ['XS', 'S', 'M', 'L'],
     bg: ['#E8E7E2', '#DDDCD7'],
     accent: '#9C9C9C',
@@ -63,6 +67,7 @@ const PRODUCTS = [
     originalPrice: '110 €',
     tag: 'PROMO',
     tagColor: '#4A4A4A',
+    image: '/demo-collection2.webp',
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
     bg: ['#E0DFDA', '#D6D5D0'],
     accent: '#7A7A7A',
@@ -77,6 +82,7 @@ const PRODUCTS = [
     originalPrice: null,
     tag: null,
     tagColor: null,
+    image: '/demo-collection.webp',
     sizes: ['S', 'M', 'L', 'XL'],
     bg: ['#DCDBD6', '#D2D1CC'],
     accent: '#8A8A8A',
@@ -91,6 +97,7 @@ const PRODUCTS = [
     originalPrice: null,
     tag: 'ÉDITION LTD.',
     tagColor: '#3A3A3A',
+    image: '/demo-collection2.webp',
     sizes: ['S', 'M', 'L', 'XL'],
     bg: ['#E6E5E0', '#DCDBD6'],
     accent: '#7C7C7C',
@@ -153,17 +160,18 @@ function ProductSilhouette({ id, accent }) {
 }
 
 /* ── Carte produit individuelle ── */
-function ProductCard({ product, visible, delay, featured }) {
+function ProductCard({ product, visible, delay, featured, onAddToCart }) {
   const [hoveredSize, setHoveredSize] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [addedFeedback, setAddedFeedback] = useState(false);
 
   const handleAddToCart = useCallback((e) => {
     e.preventDefault();
-    if (!selectedSize && !featured) return;
+    if (!selectedSize) return;
+    onAddToCart(product, selectedSize);
     setAddedFeedback(true);
     setTimeout(() => setAddedFeedback(false), 1800);
-  }, [selectedSize, featured]);
+  }, [onAddToCart, product, selectedSize]);
 
   return (
     <Link
@@ -175,13 +183,26 @@ function ProductCard({ product, visible, delay, featured }) {
       {/* Zone image */}
       <div className="cv2-card-img" style={{ background: `linear-gradient(145deg, ${product.bg[0]} 0%, ${product.bg[1]} 100%)` }}>
 
+        {/* Photo produit ou silhouette fallback */}
+        {product.image ? (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="cv2-card-photo"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <div className="cv2-card-silhouette">
+            <ProductSilhouette id={product.id} accent={product.accent} />
+          </div>
+        )}
+
+        {/* Voile de contraste subtil */}
+        <div className="cv2-card-scrim" aria-hidden="true" />
+
         {/* Numérotation éditoriale */}
         <span className="cv2-card-num" aria-hidden="true">{product.num}</span>
-
-        {/* Silhouette produit */}
-        <div className="cv2-card-silhouette">
-          <ProductSilhouette id={product.id} accent={product.accent} />
-        </div>
 
         {/* Tag (NOUVEAU, BEST-SELLER…) */}
         {product.tag && (
@@ -209,7 +230,7 @@ function ProductCard({ product, visible, delay, featured }) {
           </div>
 
           <button
-            className={`cv2-add-btn ${addedFeedback ? 'cv2-add-btn--added' : ''} ${!selectedSize && !featured ? 'cv2-add-btn--disabled' : ''}`}
+            className={`cv2-add-btn ${addedFeedback ? 'cv2-add-btn--added' : ''} ${!selectedSize ? 'cv2-add-btn--disabled' : ''}`}
             onClick={handleAddToCart}
             aria-label={addedFeedback ? 'Ajouté au panier' : 'Ajouter au panier'}
           >
@@ -242,6 +263,7 @@ function ProductCard({ product, visible, delay, featured }) {
 
 /* ── Section principale ── */
 export default function Collection() {
+  const { addToCart } = useCart();
   const sectionRef = useRef(null);
   const headerRef  = useRef(null);
   const [visibleCards, setVisibleCards] = useState(new Set());
@@ -250,6 +272,9 @@ export default function Collection() {
 
   const featured = PRODUCTS.find(p => p.featured);
   const grid     = PRODUCTS.filter(p => !p.featured);
+  const handleAddToCart = useCallback((product, size) => {
+    addToCart(product, 1, { id: size, size });
+  }, [addToCart]);
 
   /* IntersectionObserver — header */
   useEffect(() => {
@@ -347,6 +372,7 @@ export default function Collection() {
             visible={visibleCards.has(0)}
             delay={0}
             featured
+            onAddToCart={handleAddToCart}
           />
         </div>
 
@@ -379,6 +405,7 @@ export default function Collection() {
               visible={visibleCards.has(i + 1)}
               delay={i * 80}
               featured={false}
+              onAddToCart={handleAddToCart}
             />
           </div>
         ))}
@@ -393,12 +420,15 @@ export default function Collection() {
             Livraison offerte dès 150&nbsp;€ · Dakar & Paris
           </p>
         </div>
-        <Link to="/catalog" className="cv2-cta">
-          <span>VOIR TOUTE LA COLLECTION</span>
-          <svg width="18" height="7" viewBox="0 0 18 7" fill="none" aria-hidden="true">
-            <path d="M0 3.5H16M13 1L16.5 3.5L13 6" stroke="currentColor" strokeWidth="0.9"/>
-          </svg>
-        </Link>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <Link to="/essayage" className="cv2-cta"><span>ESSAYER MES VÊTEMENTS</span></Link>
+          <Link to="/catalog" className="cv2-cta">
+            <span>VOIR TOUTE LA COLLECTION</span>
+            <svg width="18" height="7" viewBox="0 0 18 7" fill="none" aria-hidden="true">
+              <path d="M0 3.5H16M13 1L16.5 3.5L13 6" stroke="currentColor" strokeWidth="0.9"/>
+            </svg>
+          </Link>
+        </div>
       </div>
 
       {/* ── STYLES ── */}
@@ -568,18 +598,52 @@ export default function Collection() {
         .cv2-card:hover .cv2-card-img {
           box-shadow: 0 20px 60px rgba(0,0,0,0.12);
         }
+        /* Photo produit */
+        .cv2-card-photo {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center center;
+          transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
+          display: block;
+        }
+        .cv2-card:hover .cv2-card-photo {
+          transform: scale(1.06);
+        }
+
+        /* Voile de contraste léger */
+        .cv2-card-scrim {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.15) 0%,
+            transparent 25%,
+            transparent 65%,
+            rgba(0, 0, 0, 0.28) 100%
+          );
+          pointer-events: none;
+          z-index: 1;
+        }
 
         /* Numéro éditorial */
         .cv2-card-num {
           position: absolute;
-          top: 16px;
-          left: 18px;
+          top: 14px;
+          left: 14px;
           font-family: "Archivo", sans-serif;
-          font-weight: 900;
-          font-size: 0.55rem;
-          letter-spacing: 0.15em;
-          color: rgba(10,10,10,0.18);
-          z-index: 1;
+          font-weight: 800;
+          font-size: 0.46rem;
+          letter-spacing: 0.12em;
+          color: #0A0A0A;
+          background: rgba(242, 241, 239, 0.90);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+          padding: 3px 7px;
+          border-radius: 1px;
+          z-index: 2;
           user-select: none;
         }
 
@@ -894,8 +958,8 @@ export default function Collection() {
           .cv2-featured-wrap { padding: 0 36px; grid-template-columns: 1fr 260px; align-items: center; }
           .cv2-card--featured .cv2-card-img { aspect-ratio: 3 / 2; }
           .cv2-grid { grid-template-columns: repeat(2, 1fr); gap: 44px 24px; padding: 0 36px; }
-          .cv2-footer { padding: 40px 36px 0; flex-direction: column; align-items: flex-start; gap: 24px; }
-          .cv2-cta { width: 100%; justify-content: center; }
+          .cv2-footer { padding: 40px 36px 0; flex-direction: column; align-items: center; gap: 24px; }
+          .cv2-cta { width: fit-content !important; justify-content: center; padding: 15px 30px !important; }
         }
 
         /* ════════════════════════════════════════
@@ -935,9 +999,16 @@ export default function Collection() {
             gap: 36px 16px;
             padding: 0 20px;
           }
-          .cv2-footer { padding: 36px 20px 0; flex-direction: column; gap: 20px; }
+          .cv2-footer { padding: 36px 20px 0; flex-direction: column; align-items: center; gap: 20px; }
           .cv2-footer-note { display: none; }
-          .cv2-cta { width: 100%; justify-content: center; font-size: 0.62rem; }
+          .cv2-cta { width: fit-content !important; justify-content: center; font-size: 0.62rem; padding: 13px 22px !important; }
+
+          /* Les interactions hover n'existent pas au pouce : la sélection
+             de taille et l'ajout doivent rester visibles sur mobile. */
+          .cv2-card-overlay { opacity: 1; padding: 10px; gap: 6px; }
+          .cv2-size-row, .cv2-add-btn { transform: translateY(0); }
+          .cv2-size-btn { min-width: 34px; min-height: 36px; padding: 7px 8px; }
+          .cv2-add-btn { min-height: 44px; padding: 10px 12px; font-size: 0.48rem; }
         }
 
         @media (max-width: 420px) {

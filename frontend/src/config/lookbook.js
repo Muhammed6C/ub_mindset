@@ -1,0 +1,42 @@
+export const LOOKBOOK_SCENES = [
+  {
+    number: '01',
+    title: 'DISCIPLINE',
+    product: 'HOODIE TECH',
+    image: '/lookbook/scene-01.svg',
+    imagePosition: 'center center',
+    destination: '/#collection',
+  },
+  {
+    number: '02',
+    title: 'FOCUS TOTAL',
+    product: 'VESTE WIND BREAKER',
+    image: '/lookbook/scene-02.svg',
+    imagePosition: 'center center',
+    destination: '/#collection',
+  },
+  {
+    number: '03',
+    title: 'SANS LIMITE',
+    product: 'LEGGING PERFORMANCE',
+    image: '/lookbook/scene-03.svg',
+    imagePosition: 'center center',
+    destination: '/#collection',
+  },
+  {
+    number: '04',
+    title: 'ESSENTIEL',
+    product: 'T-SHIRT ESSENTIAL',
+    image: '/lookbook/scene-04.svg',
+    imagePosition: 'center center',
+    destination: '/#collection',
+  },
+  {
+    number: '05',
+    title: 'MOUVEMENT',
+    product: 'SHORT TRAINING',
+    image: '/lookbook/scene-05.svg',
+    imagePosition: 'center center',
+    destination: '/#collection',
+  },
+];

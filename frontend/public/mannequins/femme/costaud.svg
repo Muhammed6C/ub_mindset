@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 400" width="200" height="400">
+  <defs>
+    <linearGradient id="bodyGradFC" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f0d0b0"/>
+      <stop offset="100%" style="stop-color:#e0b890"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="100" cy="35" rx="22" ry="28" fill="url(#bodyGradFC)"/>
+  <path d="M 78 20 Q 100 5 122 20 L 120 50 Q 100 55 80 50 Z" fill="#4a3728"/>
+  <rect x="90" y="58" width="20" height="18" fill="url(#bodyGradFC)"/>
+  <path d="M 60 75 Q 100 62 140 75 L 135 175 Q 100 190 65 175 Z" fill="url(#bodyGradFC)"/>
+  <ellipse cx="100" cy="135" rx="32" ry="38" fill="url(#bodyGradFC)"/>
+  <path d="M 60 75 Q 45 85 40 125 L 38 175 Q 40 180 45 175 L 50 125 L 55 80 Z" fill="url(#bodyGradFC)"/>
+  <path d="M 140 75 Q 155 85 160 125 L 162 175 Q 160 180 155 175 L 150 125 L 145 80 Z" fill="url(#bodyGradFC)"/>
+  <path d="M 65 175 Q 100 190 135 175 L 130 225 Q 100 242 70 225 Z" fill="url(#bodyGradFC)"/>
+  <path d="M 70 225 L 65 320 Q 63 325 68 325 L 78 325 Q 80 325 78 320 L 80 225 Z" fill="url(#bodyGradFC)"/>
+  <path d="M 130 225 L 120 225 L 122 320 Q 120 325 122 325 L 132 325 Q 137 325 135 320 Z" fill="url(#bodyGradFC)"/>
+  <ellipse cx="73" cy="330" rx="12" ry="6" fill="#8B4513"/>
+  <ellipse cx="127" cy="330" rx="12" ry="6" fill="#8B4513"/>
+</svg>

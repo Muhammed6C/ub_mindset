@@ -588,7 +588,16 @@ export default function Hero() {
             margin-bottom: 18px !important;
           }
           .hv2-cta-group {
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 18px !important;
             margin-bottom: 18px !important;
+          }
+          .hv2-cta-primary {
+            width: fit-content !important;
+            padding: 13px 22px !important;
+            font-size: 0.66rem !important;
+            letter-spacing: 0.24em !important;
           }
           .hv2-trust {
             margin-bottom: 20px !important;
@@ -695,9 +704,16 @@ export default function Hero() {
           .hv2-content {
             padding: 80px 18px 52px !important;
           }
+          .hv2-cta-group {
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 16px !important;
+          }
           .hv2-cta-primary {
-            width: 100%;
-            justify-content: center;
+            width: fit-content !important;
+            padding: 12px 20px !important;
+            font-size: 0.64rem !important;
+            letter-spacing: 0.22em !important;
           }
         }
 
