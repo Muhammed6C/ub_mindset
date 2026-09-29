@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const NAV_LINKS = [
   { label: 'Collection',     to: '/catalog' },
   { label: 'Nouveautés',     to: '/catalog?filter=new' },
   { label: 'Lookbook',       to: '/lookbook' },
-  { label: 'Notre Histoire', to: '/about' },
+  { label: 'Notre Histoire', to: '/notre-histoire' },
 ];
 
 export default function Navbar({ cartCount = 0 }) {
@@ -15,6 +15,7 @@ export default function Navbar({ cartCount = 0 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
+  const [marqueOpen, setMarqueOpen] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === '/';
 
@@ -178,6 +179,161 @@ export default function Navbar({ cartCount = 0 }) {
                 {item.label}
               </Link>
             ))}
+
+            {/* ── LIEN LA MARQUE avec dropdown ── */}
+            <div
+              style={{ position: 'relative' }}
+              onMouseEnter={() => setMarqueOpen(true)}
+              onMouseLeave={() => setMarqueOpen(false)}
+            >
+              <button
+                onClick={() => setMarqueOpen(!marqueOpen)}
+                style={{
+                  fontFamily: '"Archivo Narrow", "Archivo", sans-serif',
+                  fontWeight: 600,
+                  fontSize: isPill ? '0.54rem' : '0.58rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: isPill ? '0.2em' : '0.22em',
+                  color: '#3A3A3A',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  transition: 'color 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+                onMouseEnter={e => e.currentTarget.style.color = '#0A0A0A'}
+                onMouseLeave={e => e.currentTarget.style.color = '#3A3A3A'}
+              >
+                La marque
+                <svg
+                  width="10"
+                  height="6"
+                  viewBox="0 0 10 6"
+                  fill="none"
+                  style={{
+                    transform: marqueOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.25s ease',
+                  }}
+                >
+                  <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+
+              {/* Dropdown La marque */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: '50%',
+                  transform: marqueOpen ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(-8px)',
+                  opacity: marqueOpen ? 1 : 0,
+                  pointerEvents: marqueOpen ? 'all' : 'none',
+                  transition: 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                  zIndex: 200,
+                  paddingTop: '16px',
+                }}
+              >
+                <div
+                  style={{
+                    background: '#FFFFFF',
+                    borderRadius: '4px',
+                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
+                    padding: '24px',
+                    display: 'flex',
+                    gap: '20px',
+                    minWidth: '480px',
+                  }}
+                >
+                  {/* Notre Histoire */}
+                  <Link
+                    to="/notre-histoire"
+                    style={{
+                      flex: 1,
+                      textDecoration: 'none',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '100%',
+                        aspectRatio: '4 / 3',
+                        background: 'linear-gradient(145deg, #E8E7E3 0%, #D5D4D0 100%)',
+                        borderRadius: '2px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="16" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                      </svg>
+                    </div>
+                    <span
+                      style={{
+                        fontFamily: '"Archivo Narrow", "Archivo", sans-serif',
+                        fontWeight: 600,
+                        fontSize: '0.65rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.2em',
+                        color: '#0A0A0A',
+                      }}
+                    >
+                      Notre Histoire
+                    </span>
+                  </Link>
+
+                  {/* Blog */}
+                  <Link
+                    to="/blog"
+                    style={{
+                      flex: 1,
+                      textDecoration: 'none',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '100%',
+                        aspectRatio: '4 / 3',
+                        background: 'linear-gradient(145deg, #E8E7E3 0%, #D5D4D0 100%)',
+                        borderRadius: '2px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8C8C8C" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                      </svg>
+                    </div>
+                    <span
+                      style={{
+                        fontFamily: '"Archivo Narrow", "Archivo", sans-serif',
+                        fontWeight: 600,
+                        fontSize: '0.65rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.2em',
+                        color: '#0A0A0A',
+                      }}
+                    >
+                      Blog
+                    </span>
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* ── PANIER (desktop) ── */}
@@ -340,11 +496,9 @@ export default function Navbar({ cartCount = 0 }) {
           right: '8px',
           zIndex: 100,
           justifyContent: 'space-around',
-          padding: '8px 14px calc(8px + env(safe-area-inset-bottom))',
-          padding: '16px 20px calc(16px + env(safe-area-inset-bottom))',
+          padding: '8px 16px calc(8px + env(safe-area-inset-bottom))',
           background: 'rgba(255, 255, 255, 0.45)',
           backdropFilter: 'blur(40px) saturate(200%)',
-          borderRadius: '28px',
           borderRadius: '44px',
           border: '1px solid rgba(255, 255, 255, 0.5)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 -1px 0 rgba(0, 0, 0, 0.03)',
@@ -361,11 +515,13 @@ export default function Navbar({ cartCount = 0 }) {
             <Link
               key={item.label}
               to={item.to}
+              data-nav-item
+              data-active={isActive}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '4px',
+                gap: '3px',
                 textDecoration: 'none',
                 color: isActive ? '#0A0A0A' : '#8C8C8C',
                 fontWeight: isActive ? 700 : 500,
@@ -373,20 +529,20 @@ export default function Navbar({ cartCount = 0 }) {
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 minWidth: '56px',
-                transition: 'color 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                transform: isActive ? 'scale(1.08)' : 'scale(1)',
+                transition: 'color 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+                transform: isActive ? 'scale(1.05)' : 'scale(1)',
               }}
             >
               <svg
-                width="24"
-                height="24"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill={isActive ? '#0A0A0A' : 'none'}
                 stroke={isActive ? '#0A0A0A' : '#8C8C8C'}
                 strokeWidth={isActive ? 2 : 1.5}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                style={{ transition: 'fill 0.25s ease, stroke 0.25s ease' }}
+                style={{ transition: 'fill 0.3s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.3s cubic-bezier(0.22, 1, 0.36, 1)' }}
               >
                 {item.icon === 'home' && <><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></>}
                 {item.icon === 'grid' && <><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></>}
@@ -541,7 +697,8 @@ export default function Navbar({ cartCount = 0 }) {
             { label: 'Collection',     to: '/catalog',          icon: 'grid' },
             { label: 'Nouveautés',     to: '/catalog?filter=new', icon: 'sparkle' },
             { label: 'Lookbook',       to: '/lookbook',         icon: 'book' },
-            { label: 'Notre Histoire', to: '/about',            icon: 'info' },
+            { label: 'Notre Histoire', to: '/notre-histoire',   icon: 'info' },
+            { label: 'Blog',           to: '/blog',             icon: 'blog' },
             { label: 'Panier',         to: '/cart',             icon: 'cart' },
           ].map(item => {
             const isActive = location.pathname === item.to;
@@ -572,6 +729,7 @@ export default function Navbar({ cartCount = 0 }) {
                   {item.icon === 'sparkle' && <><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/></>}
                   {item.icon === 'book' && <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></>}
                   {item.icon === 'info' && <><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></>}
+                  {item.icon === 'blog' && <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></>}
                   {item.icon === 'cart' && <><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></>}
                 </svg>
                 {item.label}

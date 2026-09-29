@@ -2,8 +2,10 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
+import Blog from './pages/Blog';
 import TryOn from './pages/TryOn';
 import Lookbook from './pages/Lookbook';
+import OurStory from './pages/OurStory';
 import { useCart } from './context/CartContext';
 
 // Pages à construire dans les prochaines étapes
@@ -45,9 +47,11 @@ function Storefront() {
 
       <Routes>
         <Route path="/"          element={<Home />} />
+        <Route path="/blog"      element={<Blog />} />
         <Route path="/catalog"   element={<ComingSoon label="CATALOGUE" />} />
         <Route path="/lookbook"  element={<Lookbook />} />
-        <Route path="/about"     element={<ComingSoon label="NOTRE HISTOIRE" />} />
+        <Route path="/notre-histoire" element={<OurStory />} />
+        <Route path="/about"     element={<OurStory />} />
         <Route path="/cart"      element={<ComingSoon label="PANIER" />} />
         <Route path="/checkout"  element={<ComingSoon label="COMMANDE" />} />
         <Route path="/product/:id" element={<ComingSoon label="PRODUIT" />} />
