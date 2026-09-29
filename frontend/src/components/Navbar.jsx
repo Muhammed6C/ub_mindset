@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import GlassBottomBar from './GlassBottomBar';
 
 const NAV_LINKS = [
   { label: 'Collection',     to: '/catalog' },
@@ -18,6 +19,7 @@ export default function Navbar({ cartCount = 0 }) {
   const [marqueOpen, setMarqueOpen] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === '/';
+  const mobileTabIndex = location.pathname === '/catalog' ? 1 : location.pathname === '/lookbook' ? 2 : location.pathname === '/cart' ? 3 : 0;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -484,11 +486,13 @@ export default function Navbar({ cartCount = 0 }) {
         </div>
       </nav>
 
+      <GlassBottomBar activeIndex={mobileTabIndex} onTabChange={() => {}} />
+
       {/* ══════════════════════════════════════════════════════════════
           BOTTOM NAVIGATION GLASSMORPHIQUE — style Instagram (≤768px)
           ══════════════════════════════════════════════════════════════ */}
       <nav
-        className="flex md:hidden"
+        className="hidden"
         style={{
           position: 'fixed',
           bottom: 'max(10px, env(safe-area-inset-bottom))',

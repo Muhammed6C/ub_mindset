@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './NewArrivals.css';
 
@@ -51,6 +52,37 @@ function Product({ product }) {
 }
 
 export default function NewArrivals() {
+  const carouselRef = useRef(null);
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    const mobile = window.matchMedia('(max-width: 720px)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let timer;
+
+    const startAutoplay = () => {
+      window.clearInterval(timer);
+      if (!mobile.matches || reducedMotion.matches || !carousel) return;
+
+      timer = window.setInterval(() => {
+        const card = carousel.querySelector('.new-arrivals__product');
+        if (!card) return;
+        const step = card.getBoundingClientRect().width + 32;
+        const atEnd = carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 4;
+        carousel.scrollTo({ left: atEnd ? 0 : carousel.scrollLeft + step, behavior: 'smooth' });
+      }, 3600);
+    };
+
+    startAutoplay();
+    mobile.addEventListener('change', startAutoplay);
+    reducedMotion.addEventListener('change', startAutoplay);
+    return () => {
+      window.clearInterval(timer);
+      mobile.removeEventListener('change', startAutoplay);
+      reducedMotion.removeEventListener('change', startAutoplay);
+    };
+  }, []);
+
   return (
     <section className="new-arrivals" aria-labelledby="new-arrivals-title">
       <header className="new-arrivals__header">
@@ -59,7 +91,7 @@ export default function NewArrivals() {
         <div className="new-arrivals__intro"><span>01 — 03</span><p>Les premières pièces de la nouvelle saison. Pensées pour l’intensité, dessinées pour sortir du cadre.</p></div>
       </header>
 
-      <div className="new-arrivals__grid">
+      <div className="new-arrivals__grid" ref={carouselRef} aria-roledescription="carrousel" aria-label="Nouveautés de la collection">
         {NEW_DROPS.map((product) => <Product key={product.id} product={product} />)}
       </div>
 
