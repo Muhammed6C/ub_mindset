@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import Blog from './pages/Blog';
 import TryOn from './pages/TryOn';
@@ -57,6 +58,7 @@ function Storefront() {
         <Route path="/product/:id" element={<ComingSoon label="PRODUIT" />} />
         <Route path="/essayage" element={<TryOn />} />
       </Routes>
+      {!isTryOn && <Footer />}
     </>
   );
 }

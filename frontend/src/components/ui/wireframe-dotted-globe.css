@@ -1,0 +1,7 @@
+.rotating-earth { height: min(72vw, 440px); min-height: 280px; position: relative; width: min(100%, 440px); }
+.rotating-earth canvas { cursor: grab; display: block; height: 100%; touch-action: pan-y; width: 100%; }
+.rotating-earth canvas:active { cursor: grabbing; }
+.rotating-earth canvas:focus-visible { outline: 2px solid #f2f1ef; outline-offset: 6px; }
+.rotating-earth__hint { bottom: 0; color: rgba(242,241,239,.48); font: 700 .56rem/1 "Archivo Narrow", sans-serif; left: 50%; letter-spacing: .22em; position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.rotating-earth__instructions { height: 1px; margin: -1px; overflow: hidden; position: absolute; width: 1px; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .rotating-earth__hint { display: none; } }
