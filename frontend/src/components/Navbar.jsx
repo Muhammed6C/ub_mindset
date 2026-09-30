@@ -346,35 +346,59 @@ export default function Navbar({ cartCount = 0 }) {
             <Link
               to="/cart"
               style={{
-                fontFamily: '"Archivo Narrow", "Archivo", sans-serif',
-                fontWeight: 600,
-                fontSize: isPill ? '0.54rem' : '0.58rem',
-                textTransform: 'uppercase',
-                letterSpacing: isPill ? '0.2em' : '0.22em',
-                color: '#3A3A3A',
-                textDecoration: 'none',
-                display: 'flex',
+                position: 'relative',
+                display: 'inline-flex',
                 alignItems: 'center',
-                gap: '7px',
-                transition: 'color 0.2s ease',
+                justifyContent: 'center',
+                padding: '6px 8px',
+                color: '#1A1A1A',
+                textDecoration: 'none',
+                transition: 'transform 0.2s ease, color 0.2s ease',
               }}
-              onMouseEnter={e => e.currentTarget.style.color = '#0A0A0A'}
-              onMouseLeave={e => e.currentTarget.style.color = '#3A3A3A'}
+              onMouseEnter={e => {
+                e.currentTarget.style.color = '#0A0A0A';
+                e.currentTarget.style.transform = 'scale(1.08)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.color = '#1A1A1A';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+              aria-label={`Panier (${cartCount} article${cartCount > 1 ? 's' : ''})`}
             >
-              PANIER
+              <svg
+                width={isPill ? "19" : "20"}
+                height={isPill ? "19" : "20"}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.9"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ display: 'block' }}
+              >
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+              </svg>
               {cartCount > 0 && (
                 <span
                   style={{
+                    position: 'absolute',
+                    top: '-3px',
+                    right: '-4px',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    width: '15px',
+                    minWidth: '15px',
                     height: '15px',
-                    borderRadius: '50%',
+                    borderRadius: '9999px',
                     background: '#0A0A0A',
                     color: '#F2F1EF',
                     fontSize: '8px',
                     fontWeight: 800,
+                    padding: '0 3px',
+                    lineHeight: 1,
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
                   }}
                 >
                   {cartCount}

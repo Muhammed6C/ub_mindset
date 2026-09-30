@@ -569,56 +569,77 @@ export default function Hero() {
            ════════════════════════════════════════ */
         @media (max-width: 768px) {
           .hv2-section {
-            height: max(100svh, 720px) !important;
-            min-height: 720px !important;
+            height: 100dvh !important;
+            min-height: 640px !important;
           }
-          /* L'image garde une zone propre : le titre ne recouvre plus le logo du vêtement. */
           .hv2-img-col {
-            bottom: auto !important;
-            height: 58% !important;
+            position: absolute !important;
+            inset: 0 !important;
+            height: 100% !important;
           }
           .hv2-img {
-            object-position: center 8% !important;
+            object-position: center 3% !important;
           }
           .hv2-img-fade-bottom {
-            height: 40% !important;
+            height: 58% !important;
             background: linear-gradient(
               to top,
               #E8E7E3 0%,
-              rgba(232, 231, 227, 0.86) 45%,
-              rgba(232, 231, 227, 0) 100%
+              rgba(232, 231, 227, 0.94) 38%,
+              rgba(232, 231, 227, 0.45) 60%,
+              transparent 100%
             ) !important;
           }
           .hv2-content {
             justify-content: flex-end !important;
-            padding: 0 20px max(104px, calc(72px + env(safe-area-inset-bottom))) !important;
-            padding-top: 52svh !important;
+            padding: 0 22px max(86px, calc(76px + env(safe-area-inset-bottom))) !important;
+            padding-top: 0 !important;
+          }
+          .hv2-label {
+            font-size: 0.44rem !important;
+            letter-spacing: 0.32em !important;
+            margin-bottom: 8px !important;
+            color: #7A7875 !important;
           }
           .hv2-title-wrap {
-            margin-bottom: 12px !important;
-          }
-          .hv2-divider {
             margin-bottom: 10px !important;
           }
+          .hv2-line1, .hv2-line2 {
+            font-size: clamp(2rem, 8vw, 2.45rem) !important;
+            line-height: 0.92 !important;
+          }
+          .hv2-divider {
+            margin-bottom: 8px !important;
+            width: 30px !important;
+          }
           .hv2-subtitle {
-            margin-bottom: 18px !important;
+            font-size: 0.52rem !important;
+            letter-spacing: 0.2em !important;
+            margin-bottom: 16px !important;
+            color: #6E6B66 !important;
           }
           .hv2-cta-group {
             flex-direction: row !important;
             align-items: center !important;
-            gap: 18px !important;
-            margin-bottom: 18px !important;
+            gap: 16px !important;
+            margin-bottom: 0 !important;
           }
           .hv2-cta-primary {
             width: fit-content !important;
-            padding: 13px 22px !important;
-            font-size: 0.66rem !important;
-            letter-spacing: 0.24em !important;
+            padding: 12px 20px !important;
+            font-size: 0.65rem !important;
+            letter-spacing: 0.22em !important;
+          }
+          .hv2-cta-secondary {
+            font-size: 0.58rem !important;
           }
           .hv2-trust {
-            margin-bottom: 20px !important;
+            display: none !important;
           }
           .hv2-edition {
+            display: none !important;
+          }
+          .hv2-scroll {
             display: none !important;
           }
         }
@@ -712,30 +733,27 @@ export default function Hero() {
            ════════════════════════════════════════ */
         @media (max-width: 480px) {
           .hv2-section {
-            height: max(100svh, 680px) !important;
-            min-height: 680px !important;
+            height: 100dvh !important;
+            min-height: 600px !important;
           }
-          .hv2-img-col { height: 56% !important; }
+          .hv2-img-col {
+            position: absolute !important;
+            inset: 0 !important;
+            height: 100% !important;
+          }
           .hv2-img {
-            object-position: center 7% !important;
-          }
-          .hv2-line1, .hv2-line2 {
-            font-size: clamp(2.3rem, 8.5vw, 2.7rem);
+            object-position: center 2% !important;
           }
           .hv2-content {
-            padding: 0 18px max(96px, calc(68px + env(safe-area-inset-bottom))) !important;
-            padding-top: 49svh !important;
+            padding: 0 18px max(84px, calc(74px + env(safe-area-inset-bottom))) !important;
+            padding-top: 0 !important;
           }
-          .hv2-cta-group {
-            flex-direction: row !important;
-            align-items: center !important;
-            gap: 16px !important;
+          .hv2-line1, .hv2-line2 {
+            font-size: clamp(1.85rem, 8vw, 2.2rem) !important;
           }
           .hv2-cta-primary {
-            width: fit-content !important;
-            padding: 12px 20px !important;
-            font-size: 0.64rem !important;
-            letter-spacing: 0.22em !important;
+            padding: 11px 18px !important;
+            font-size: 0.62rem !important;
           }
         }
 

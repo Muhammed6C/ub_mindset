@@ -31,6 +31,11 @@ export const CartProvider = ({ children }) => {
         );
       }
 
+      const rawPrice = selectedVariant?.price || product.price;
+      const numericPrice = typeof rawPrice === 'number' 
+        ? rawPrice 
+        : parseFloat(String(rawPrice || 0).replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+
       return [
         ...prev,
         {
@@ -38,7 +43,8 @@ export const CartProvider = ({ children }) => {
           product,
           variant: selectedVariant,
           quantity,
-          price: selectedVariant?.price || product.price,
+          price: numericPrice,
+          displayPrice: product.price || `${numericPrice} €`,
         },
       ];
     });

@@ -2,51 +2,10 @@ import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { COLLECTION_CATEGORIES } from '../config/collection';
+import ProductCard from './ProductCard';
 import './Collection.css';
 import './CollectionResponsive.css';
 import './CollectionInteraction.css';
-
-function ProductCard({ product, onAddToCart }) {
-  const [size, setSize] = useState(null);
-  const [added, setAdded] = useState(false);
-
-  if (product.placeholder) {
-    return <article className="collection-card collection-card--placeholder" aria-label={`${product.name}, bientôt disponible`}><span>UB</span><p>{product.tag}</p><h4>{product.name}</h4><small>{product.subtitle}</small></article>;
-  }
-
-  if (product.demo) {
-    return (
-      <article className="collection-card collection-card--demo" aria-label={`${product.name}, aperçu de démonstration`}>
-        <div className="collection-card__image"><img src={product.image} alt="Aperçu visuel à remplacer par le produit final" loading="lazy" decoding="async" /><span className="collection-card__tag">{product.tag}</span></div>
-        <div className="collection-card__info"><div className="collection-card__title-row"><h4>{product.name}</h4></div><p className="collection-card__subtitle">{product.subtitle}</p></div>
-      </article>
-    );
-  }
-
-  const add = () => {
-    if (!size) return;
-    onAddToCart(product, size);
-    setAdded(true);
-    window.setTimeout(() => setAdded(false), 1600);
-  };
-
-  return (
-    <article className="collection-card">
-      <Link className="collection-card__image" to={`/product/${product.id}`} aria-label={`Voir ${product.name}`}>
-        <img src={product.image} alt={product.name} loading="lazy" decoding="async" />
-        {product.tag && <span className="collection-card__tag">{product.tag}</span>}
-      </Link>
-      <div className="collection-card__info">
-        <div className="collection-card__title-row"><h4>{product.name}</h4><p>{product.originalPrice && <s>{product.originalPrice}</s>}{product.price}</p></div>
-        <p className="collection-card__subtitle">{product.subtitle}</p>
-        <div className="collection-card__actions" aria-label={`Choisir une taille pour ${product.name}`}>
-          <div className="collection-card__sizes">{product.sizes.map((itemSize) => <button key={itemSize} type="button" aria-pressed={size === itemSize} className={size === itemSize ? 'is-selected' : ''} onClick={() => setSize(itemSize)}>{itemSize}</button>)}</div>
-          <button type="button" className="collection-card__add" disabled={!size} onClick={add}>{added ? '✓ AJOUTÉ' : size ? 'AJOUTER' : 'TAILLE'}</button>
-        </div>
-      </div>
-    </article>
-  );
-}
 
 function CollectionRail({ category, onAddToCart }) {
   const railRef = useRef(null);

@@ -56,7 +56,6 @@ function Storefront() {
         <Route path="/about"     element={<OurStory />} />
         <Route path="/cart"      element={<ComingSoon label="PANIER" />} />
         <Route path="/checkout"  element={<ComingSoon label="COMMANDE" />} />
-        <Route path="/product/:id" element={<ComingSoon label="PRODUIT" />} />
         <Route path="/essayage" element={<TryOn />} />
       </Routes>
       {!isTryOn && <Footer />}

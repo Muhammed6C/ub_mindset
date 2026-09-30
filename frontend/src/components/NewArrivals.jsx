@@ -38,7 +38,7 @@ const NEW_DROPS = [
 function Product({ product }) {
   return (
     <article className={`new-arrivals__product ${product.className}`}>
-      <Link to={`/product/${product.id}`} className="new-arrivals__image" aria-label={`Découvrir ${product.name}`}>
+      <Link to="/catalog" className="new-arrivals__image" aria-label={`Découvrir ${product.name} dans la collection`}>
         <img src={product.image} alt={product.name} loading="lazy" decoding="async" style={{ objectPosition: product.position }} />
         <span className="new-arrivals__badge">{product.badge}</span>
         <span className="new-arrivals__discover">DÉCOUVRIR <b aria-hidden="true">↗</b></span>

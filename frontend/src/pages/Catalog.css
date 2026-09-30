@@ -8,17 +8,8 @@
 .catalog-category header { display: grid; gap: 12px; margin-bottom: 28px; }
 .catalog-category h2 { font-size: clamp(2.25rem, 5vw, 5rem); }
 .catalog-category header span { color: #5a5751; font-size: .72rem; font-weight: 700; letter-spacing: .08em; max-width: 380px; }
-.catalog-category__grid { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.catalog-card { color: inherit; display: block; min-width: 0; text-decoration: none; }
-.catalog-card__image { aspect-ratio: .75; background: #ddd6ca; overflow: hidden; position: relative; }
-.catalog-card__image img { display: block; height: 100%; object-fit: cover; transition: transform .35s ease; width: 100%; }
-.catalog-card:hover img, .catalog-card:focus-visible img { transform: scale(1.025); }
-.catalog-card__image span { background: #101010; color: #fff; font-size: .55rem; font-weight: 800; left: 10px; letter-spacing: .1em; padding: 7px 8px; position: absolute; top: 10px; }
-.catalog-card__body { padding: 12px 2px 4px; }
-.catalog-card__body h3 { font-size: .69rem; letter-spacing: .04em; margin: 0 0 6px; }
-.catalog-card__body p, .catalog-card__body small { color: #5a5751; font-size: .64rem; line-height: 1.35; margin: 0; }
-.catalog-card__body strong { display: block; font-size: .73rem; margin-top: 9px; }
-.catalog-card--demo { opacity: .76; }
-@media (min-width: 720px) { .catalog-category__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; } }
-@media (min-width: 1100px) { .catalog-category__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-@media (prefers-reduced-motion: reduce) { .catalog-card__image img { transition: none; } }
+.catalog-category__grid { display: grid; gap: 28px 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.catalog-category__grid .collection-card { flex: none !important; width: 100% !important; max-width: 100% !important; }
+@media (min-width: 720px) { .catalog-category__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px 24px; } }
+@media (min-width: 1100px) { .catalog-category__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 44px 28px; } }
+@media (max-width: 480px) { .catalog-category__grid { grid-template-columns: 1fr; gap: 32px; } }
