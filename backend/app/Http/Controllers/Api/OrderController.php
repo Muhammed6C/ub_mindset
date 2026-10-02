@@ -2,86 +2,80 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Order\StoreOrderRequest;
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
-use App\Models\OrderItem;
+use App\Services\AuditLogger;
+use App\Services\CatalogOrderService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Commandes client (§9.4 / §9.18).
+ *
+ * - Création : prix/stock recalculés côté serveur (CatalogOrderService) ;
+ * - Suivi : protégé par un jeton non devinable (anti-énumération / anti-IDOR) ;
+ * - Aucun champ de prix, total ou statut n'est accepté depuis le client.
+ */
 class OrderController extends Controller
 {
-    public function store(Request $request): JsonResponse
+    public function __construct(
+        private readonly CatalogOrderService $orders,
+        private readonly AuditLogger $audit,
+    ) {}
+
+    public function store(StoreOrderRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'customer.firstName' => 'required|string|max:100',
-            'customer.lastName' => 'required|string|max:100',
-            'customer.email' => 'required|email|max:150',
-            'customer.phone' => 'required|string|max:50',
-            'customer.address' => 'required|string|max:255',
-            'customer.city' => 'required|string|max:100',
-            'customer.paymentMethod' => 'nullable|string|in:wave_om,card',
-            'items' => 'required|array|min:1',
-            'items.*.product.id' => 'required',
-            'items.*.product.name' => 'required|string',
-            'items.*.price' => 'required|numeric|min:0',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.variant.size' => 'nullable|string',
-            'total' => 'required|numeric|min:0',
-        ]);
+        $data = $request->validated();
 
-        $customer = $validated['customer'];
-        $items = $validated['items'];
+        // `sanctum` : un client connecté peut lier sa commande à son compte.
+        $user = $request->user('sanctum');
 
-        $subtotal = collect($items)->reduce(fn ($sum, $item) => $sum + ($item['price'] * $item['quantity']), 0);
-        $shipping = $subtotal > 50000 ? 0 : 3000;
-        $total = $subtotal + $shipping;
+        $order = $this->orders->create(
+            customer: $data['customer'],
+            items: $data['items'],
+            user: $user,
+            promoCode: $data['promo_code'] ?? null,
+            notes: $data['notes'] ?? null,
+        );
 
-        $order = DB::transaction(function () use ($customer, $items, $subtotal, $shipping, $total) {
-            $order = Order::create([
-                'order_number' => 'UB-' . strtoupper(Str::random(8)),
-                'customer_name' => "{$customer['firstName']} {$customer['lastName']}",
-                'customer_email' => $customer['email'],
-                'customer_phone' => $customer['phone'],
-                'shipping_address' => $customer['address'],
-                'shipping_city' => $customer['city'],
-                'payment_method' => $customer['paymentMethod'] ?? 'wave_om',
-                'payment_status' => 'pending',
-                'order_status' => 'pending',
-                'subtotal' => $subtotal,
-                'shipping_cost' => $shipping,
-                'total' => $total,
-            ]);
-
-            foreach ($items as $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item['product']['id'] ?? null,
-                    'product_name' => $item['product']['name'],
-                    'variant_info' => isset($item['variant']['size']) ? "Taille: {$item['variant']['size']}" : null,
-                    'quantity' => $item['quantity'],
-                    'unit_price' => $item['price'],
-                    'total_price' => $item['price'] * $item['quantity'],
-                ]);
-            }
-
-            return $order;
-        });
+        $this->audit->order('created', $order);
 
         return response()->json([
             'message' => 'Commande créée avec succès',
-            'order_id' => $order->order_number,
-            'order' => $order->load('items'),
-        ], 201);
+            'order_number' => $order->order_number,
+            'tracking_token' => $order->tracking_token,
+            'order' => new OrderResource($order),
+        ], Response::HTTP_CREATED);
     }
 
-    public function show(string $orderNumber): JsonResponse
+    public function show(Request $request, string $orderNumber): JsonResponse
     {
-        $order = Order::where('order_number', $orderNumber)
+        $order = Order::query()
             ->with('items')
+            ->where('order_number', $orderNumber)
             ->firstOrFail();
 
-        return response()->json(['data' => $order]);
+        $provided = (string) $request->query('token', '');
+        $user = $request->user('sanctum');
+
+        // Suivi par jeton non devinable — comparaison en temps constant (anti-timing).
+        $hasValidToken = $order->tracking_token !== null
+            && $provided !== ''
+            && hash_equals((string) $order->tracking_token, $provided);
+
+        $isOwner = $user !== null && $order->user_id !== null && $order->user_id === $user->id;
+        $isStaff = $user !== null && $user->role instanceof UserRole && $user->role->isAdmin();
+
+        if (! $hasValidToken && ! $isOwner && ! $isStaff) {
+            // 403 : ne révèle pas si la commande existe réellement.
+            throw new AuthorizationException('Accès à la commande refusé.');
+        }
+
+        return response()->json(['data' => new OrderResource($order)]);
     }
 }

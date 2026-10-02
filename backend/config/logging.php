@@ -126,6 +126,15 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // Journal d'audit des actions sensibles (§9.14) — rotation longue durée.
+        'audit' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/audit.log'),
+            'level' => env('LOG_AUDIT_LEVEL', 'info'),
+            'days' => env('LOG_AUDIT_DAYS', 90),
+            'replace_placeholders' => true,
+        ],
+
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,

@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\CorrelationId;
+use App\Http\Middleware\EnsureIsAdmin;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,7 +16,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Identifiant de corrélation sur TOUTES les requêtes (traçabilité / audit).
+        $middleware->prepend(CorrelationId::class);
+
+        // En-têtes de sécurité sur TOUTES les réponses (§9.13).
+        $middleware->append(SecurityHeaders::class);
+
+        // Rate limiting global de l'API (limiteur nommé « api »).
+        $middleware->throttleApi();
+
+        // Alias des middlewares applicatifs.
+        $middleware->alias([
+            'admin' => EnsureIsAdmin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

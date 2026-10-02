@@ -1,0 +1,98 @@
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ExampleTest[39m
+  [32;1m‘£Ù[39;22m[90m [39m[90mthat true is true[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Unit\UserRoleTest[39m
+  [32;1m‘£Ù[39;22m[90m [39m[90mrole helper methods[39m[90m                              [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mrole values whitelist[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\AdminAccessTest[39m
+  [32;1m‘£Ù[39;22m[90m [39m[90mguest is unauthenticated on admin routes[39m[90m         [39m [90m0.56s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mcustomer is forbidden on admin routes[39m[90m            [39m [90m0.06s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90minactive admin is forbidden[39m[90m                      [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90madmin can access admin routes[39m[90m                    [39m [90m0.04s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mstaff can access admin routes[39m[90m                    [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90madmin login rejects non admin account[39m[90m            [39m [90m0.06s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90madmin login succeeds for admin[39m[90m                   [39m [90m0.05s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\CategoryCrudTest[39m
+  [32;1m‘£Ù[39;22m[90m [39m[90mguest cannot create category[39m[90m                     [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mcustomer cannot create category[39m[90m                  [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90madmin can create category and slug is generated[39m[90m  [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90madmin can update category[39m[90m                        [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mduplicate slug is rejected[39m[90m                       [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mhtml in name is rejected[39m[90m                         [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mcategory cannot be its own parent[39m[90m                [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mstaff cannot delete category but admin can[39m[90m       [39m [90m0.03s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\MediaUploadTest[39m
+  [32;1m‘£Ù[39;22m[90m [39m[90madmin can upload a valid image[39m[90m                   [39m [90m0.07s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mphp file is rejected[39m[90m                             [39m [90m0.04s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mdisguised php file is rejected[39m[90m                   [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90msvg upload is rejected[39m[90m                           [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mcustomer cannot upload media[39m[90m                     [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mpublic media is served with safe headers[39m[90m         [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mprivate media returns 404 to guests[39m[90m              [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mprivate media is served to admin[39m[90m                 [39m [90m0.03s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProductCrudTest[39m
+  [32;1m‘£Ù[39;22m[90m [39m[90madmin can create product[39m[90m                         [39m [90m0.04s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90moriginal price must be greater or equal to price[39m[90m [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mtechnical fields injected by client are ignored[39m[90m  [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90minvalid sort is rejected[39m[90m                         [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mper page is capped[39m[90m                               [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mstaff cannot delete product but admin can[39m[90m        [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mcustomer cannot access admin products[39m[90m            [39m [90m0.02s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProductImageTest[39m
+  [32;1m‘£Ù[39;22m[90m [39m[90madmin can add image from media[39m[90m                   [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90madmin can add image from external url[39m[90m            [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mnon image media is rejected[39m[90m                      [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mrequires media or path[39m[90m                           [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mjavascript url is rejected[39m[90m                       [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mimage of another product cannot be deleted[39m[90m       [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mcustomer cannot add image[39m[90m                        [39m [90m0.03s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProductVariantCrudTest[39m
+  [32;1m‘£Ù[39;22m[90m [39m[90madmin can create variant with initial stock jour[39m[90m‘«™[39m [90m0.04s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mstock cannot be set directly on update[39m[90m           [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90msku must be unique[39m[90m                               [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mstaff can create but only admin can delete[39m[90m       [39m [90m0.03s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\StockAdjustTest[39m
+  [32;1m‘£Ù[39;22m[90m [39m[90madmin can add stock and movement is logged[39m[90m       [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90minjected user id is ignored[39m[90m                      [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mstock cannot become negative[39m[90m                     [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90madjust sets absolute stock[39m[90m                       [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mquantity must be positive for in or out[39m[90m          [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mcustomer cannot adjust stock[39m[90m                     [39m [90m0.02s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\LoginTest[39m
+  [32;1m‘£Ù[39;22m[90m [39m[90muser can login with valid credentials[39m[90m            [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mlogin fails with generic message on wrong passwo[39m[90m‘«™[39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mlogin does not reveal unknown email[39m[90m              [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90minactive user cannot login[39m[90m                       [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mlogin is rate limited[39m[90m                            [39m [90m0.04s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mauthenticated user payload hides sensitive field[39m[90m‘«™[39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mlogout revokes current token[39m[90m                     [39m [90m0.02s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ExampleTest[39m
+  [32;1m‘£Ù[39;22m[90m [39m[90mthe application returns a successful response[39m[90m    [39m [90m0.04s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Orders\OrderCreationTest[39m
+  [32;1m‘£Ù[39;22m[90m [39m[90morder total is calculated server side[39m[90m            [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mshipping cost applies below threshold[39m[90m            [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90morder rejects unknown variant[39m[90m                    [39m [90m0.03s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90morder rejects insufficient stock[39m[90m                 [39m [90m0.04s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90morder rejects html in customer fields[39m[90m            [39m [90m0.04s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90morder tracking requires valid token[39m[90m              [39m [90m0.05s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Security\SecurityHardeningTest[39m
+  [32;1m‘£Ù[39;22m[90m [39m[90mapi responses include security headers[39m[90m           [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90mrole is not mass assignable[39m[90m                      [39m [90m0.02s[39m  
+  [32;1m‘£Ù[39;22m[90m [39m[90munknown api route returns json 404[39m[90m               [39m [90m0.03s[39m  
+
+  [90mTests:[39m    [32;1m67 passed[39;22m[90m (182 assertions)[39m
+  [90mDuration:[39m [39m3.07s[39m
+
+

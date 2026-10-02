@@ -54,7 +54,6 @@
 
 .try-on__eyebrow,
 .try-on__slider span,
-.try-on__morphology,
 .try-on__piece h2,
 .try-on__piece p,
 .try-on__order-bar {
@@ -87,17 +86,6 @@
   box-shadow: 0 2px 12px rgba(0,0,0,.04);
 }
 
-.try-on__toggle {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border: 1px solid #d4d0cb;
-  padding: 4px;
-  margin-bottom: 24px;
-  border-radius: 12px;
-  background: rgba(0,0,0,.03);
-}
-
-.try-on__toggle button,
 .try-on__sizes button {
   border: 0;
   background: transparent;
@@ -109,7 +97,6 @@
   color: #6a6560;
 }
 
-.try-on__toggle button.is-active,
 .try-on__sizes button.is-active {
   background: #1a1a1a;
   color: #f5f3f0;
@@ -175,112 +162,46 @@
   margin-top: 4px;
 }
 
-.try-on__morphology {
-  margin: 24px 0 0;
-  font-size: .62rem;
-  color: #8a8580;
+.try-on__morphologies {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 10px;
 }
 
-.try-on__morphology strong {
-  color: #1a1a1a;
-  font-weight: 800;
+.try-on__morphologies button {
+  min-height: 44px;
+  border: 1px solid #c9c6bf;
+  border-radius: 8px;
+  background: transparent;
+  color: #6a6560;
+  font: 700 .58rem/1 "Archivo Narrow", sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.try-on__morphologies button.is-active {
+  border-color: #1a1a1a;
+  background: #1a1a1a;
+  color: #f5f1ef;
+}
+
+.try-on__warning {
+  margin: 14px 0 0;
+  color: #b4552e;
+  font: 600 .58rem/1.5 "Archivo Narrow", sans-serif;
+  letter-spacing: .06em;
 }
 
 .try-on__stage {
-  min-height: 480px;
-  display: grid;
-  place-items: center;
-}
-
-.try-on__studio {
   position: relative;
-  width: min(100%, 400px);
-  height: 540px;
-  isolation: isolate;
-}
-
-.try-on__shadow {
-  position: absolute;
-  z-index: 0;
-  width: 65%;
-  height: 10%;
-  bottom: 2%;
-  left: 17.5%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(0,0,0,.15) 0%, transparent 70%);
-  filter: blur(12px);
-}
-
-.try-on__mannequin {
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  opacity: 1;
-  transition: opacity .35s ease, transform .35s ease;
-}
-
-.try-on__mannequin--entering {
-  animation: try-on-fade-in .4s ease both;
-}
-
-.try-on__mannequin--exiting {
-  animation: try-on-fade-out .3s ease both;
-}
-
-.try-on__mannequin-fallback {
-  position: absolute;
-  z-index: 1;
-  inset: 5% 25% 5%;
-  display: grid;
-  place-items: center;
-  border-radius: 48% 48% 12% 12%;
-  background: linear-gradient(155deg, #c2bdb4, #78736c);
-  color: rgba(255,255,255,.4);
-  font: 900 7rem "Archivo", sans-serif;
-}
-
-.try-on__garment {
-  position: absolute;
-  height: auto;
-  max-height: 75%;
-  object-fit: contain;
-  opacity: 1;
-  transition: opacity .35s ease, transform .35s ease;
-  pointer-events: none;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,.08));
-}
-
-.try-on__garment--entering {
-  animation: try-on-fade-in .4s ease both;
-}
-
-.try-on__garment--exiting {
-  animation: try-on-fade-out .3s ease both;
-}
-
-@keyframes try-on-fade-in {
-  from {
-    opacity: 0;
-    transform: scale(.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes try-on-fade-out {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(.96);
-  }
+  height: 520px;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 16px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 22%, rgba(255,255,255,.75), rgba(232,228,222,.55));
 }
 
 .try-on__pieces {
@@ -441,15 +362,11 @@
   }
 
   .try-on__layout {
-    grid-template-columns: 280px minmax(400px, 1fr) 310px;
+    grid-template-columns: 280px minmax(360px, 1fr) 310px;
     align-items: start;
   }
 
   .try-on__stage {
-    min-height: 620px;
-  }
-
-  .try-on__studio {
     height: 620px;
   }
 

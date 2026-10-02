@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -9,19 +10,39 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Admin & Test User
-        User::firstOrCreate(
-            ['email' => 'admin@ubmindset.com'],
+        // 1. Compte administrateur
+        //    Aucun mot de passe par défaut n'est autorisé en production (§9.12).
+        $adminPassword = env('ADMIN_SEED_PASSWORD');
+
+        if (blank($adminPassword)) {
+            if (app()->isProduction()) {
+                throw new RuntimeException(
+                    'ADMIN_SEED_PASSWORD doit être défini en production (aucun mot de passe par défaut autorisé).'
+                );
+            }
+
+            $adminPassword = 'password123';
+        }
+
+        $admin = User::firstOrCreate(
+            ['email' => env('ADMIN_SEED_EMAIL', 'admin@ubmindset.com')],
             [
                 'name' => 'Admin UB Mindset',
-                'password' => Hash::make('password123'),
+                'password' => $adminPassword,
             ]
         );
+
+        // `role`/`is_active` ne sont pas mass-assignables (§9.4) : forcés côté serveur.
+        $admin->forceFill([
+            'role' => UserRole::Admin,
+            'is_active' => true,
+        ])->save();
 
         // 2. Categories
         $vetements = Category::firstOrCreate(
@@ -126,7 +147,7 @@ class DatabaseSeeder extends Seeder
                     'product_id' => $product->id,
                     'size' => $size,
                 ], [
-                    'sku' => 'UB-' . strtoupper(Str::slug($product->name)) . '-' . $size,
+                    'sku' => 'UB-'.strtoupper(Str::slug($product->name)).'-'.$size,
                     'price' => $product->price,
                     'stock' => 50,
                 ]);

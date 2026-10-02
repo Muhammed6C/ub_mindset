@@ -7,8 +7,10 @@ services:
       POSTGRES_DB: ub_mindset
       POSTGRES_USER: ub_user
       POSTGRES_PASSWORD: ub_password
+    # Sécurité (§9.17) : PostgreSQL ne doit JAMAIS être exposé au réseau.
+    # On lie le port à la boucle locale uniquement (pas de 0.0.0.0).
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

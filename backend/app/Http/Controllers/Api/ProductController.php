@@ -3,53 +3,73 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProductIndexRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ProductController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index(ProductIndexRequest $request): JsonResponse
     {
-        $query = Product::with(['category', 'variants'])
+        Gate::authorize('viewAny', Product::class);
+
+        $validated = $request->validated();
+
+        $query = Product::query()->with(['category', 'variants', 'images'])
             ->where('is_active', true);
 
-        // Filter by category slug or id
-        if ($request->filled('category')) {
-            $category = $request->input('category');
-            $query->whereHas('category', function ($q) use ($category) {
-                $q->where('slug', $category)->orWhere('name', 'ilike', "%{$category}%");
+        if (! empty($validated['category'])) {
+            $query->whereHas('category', fn ($q) => $q->where('slug', $validated['category']));
+        }
+
+        if (! empty($validated['search'])) {
+            $needle = '%'.mb_strtolower($validated['search']).'%';
+
+            $query->where(function ($q) use ($needle) {
+                // Portable (PostgreSQL + SQLite) et paramétré : anti-injection SQL.
+                $q->whereRaw('LOWER(name) LIKE ?', [$needle])
+                    ->orWhereRaw('LOWER(description) LIKE ?', [$needle]);
             });
         }
 
-        // Search by keyword
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'ilike', "%{$search}%")
-                  ->orWhere('description', 'ilike', "%{$search}%");
-            });
+        if (array_key_exists('featured', $validated) && $validated['featured'] !== null) {
+            $query->where('is_featured', (bool) $validated['featured']);
         }
 
-        // Sort
-        $sort = $request->input('sort', 'latest');
-        match ($sort) {
-            'price_asc' => $query->orderBy('price', 'asc'),
-            'price_desc' => $query->orderBy('price', 'desc'),
-            default => $query->orderBy('id', 'desc'),
+        if (array_key_exists('min_price', $validated) && $validated['min_price'] !== null) {
+            $query->where('price', '>=', (float) $validated['min_price']);
+        }
+
+        if (array_key_exists('max_price', $validated) && $validated['max_price'] !== null) {
+            $query->where('price', '<=', (float) $validated['max_price']);
+        }
+
+        match ($validated['sort'] ?? 'latest') {
+            'oldest' => $query->oldest('id'),
+            'price_asc' => $query->orderBy('price'),
+            'price_desc' => $query->orderByDesc('price'),
+            'position' => $query->orderBy('position')->orderByDesc('id'),
+            'name' => $query->orderBy('name'),
+            default => $query->latest('id'),
         };
 
-        $products = $query->paginate($request->input('per_page', 12));
+        $products = $query->paginate((int) ($validated['per_page'] ?? 12))->withQueryString();
 
-        return response()->json($products);
+        return ProductResource::collection($products)->response();
     }
 
     public function show(int $id): JsonResponse
     {
-        $product = Product::with(['category', 'variants'])
-            ->where('is_active', true)
-            ->findOrFail($id);
+        $product = Product::with(['category', 'variants', 'images'])->findOrFail($id);
 
-        return response()->json(['data' => $product]);
+        // Anti-énumération : un produit non visible est indiscernable d'un
+        // produit inexistant (404 plutôt que 403).
+        if (! Gate::allows('view', $product)) {
+            abort(404);
+        }
+
+        return response()->json(['data' => new ProductResource($product)]);
     }
 }

@@ -47,6 +47,16 @@ return [
             'report' => false,
         ],
 
+        // Médias uploadés (§9.9) : stockés HORS racine web, servis via contrôleur
+        // (Content-Type maîtrisé, jamais d'exécution de fichier).
+        'media' => [
+            'driver' => 'local',
+            'root' => storage_path('app/media'),
+            'visibility' => 'private',
+            'throw' => true,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

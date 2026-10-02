@@ -1,0 +1,14 @@
+﻿  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\AdminAccessTest[39m
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\CategoryCrudTest[39m
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\MediaUploadTest[39m
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\OrderManagementTest[39m
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProductCrudTest[39m
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProductImageTest[39m
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\ProductVariantCrudTest[39m
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Admin\StockAdjustTest[39m
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Auth\LoginTest[39m
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ExampleTest[39m
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Orders\OrderCreationTest[39m
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Security\SecurityHardeningTest[39m
+  [90mTests:[39m    [32;1m88 passed[39;22m[90m (233 assertions)[39m
+  [90mDuration:[39m [39m6.06s[39m

@@ -1,0 +1,39 @@
+
+  ..Ô£ôÔ£ô.Ô£ôÔ£ô........Ô£ôÔ£ôÔ£ôÔ£ôÔ£ôÔ£ô....Ô£ô..Ô£ô..Ô£ô..Ô£ô...Ô£ô.Ô£ô.Ô£ôÔ£ô..Ô£ôÔ£ô....Ô£ôÔ£ô...
+  ..........................Ô£ôÔ£ôÔ£ô......Ô£ôÔ£ôÔ£ôÔ£ôÔ£ôÔ£ô.......
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ Laravel  
+    FIXED   .............. 105 files, 31 style issues fixed  
+  Ô£ô app\Http\Controllers\Api\Admin\CategoryController.php ÔÇª  
+  Ô£ô app\Http\Controllers\Api\Admin\MediaController.php linÔÇª  
+  Ô£ô app\Http\Controllers\Api\Admin\ProductVariantController.php line_ending, unary_operator_spaces, braces_position, not_operator_with_successor_space, single_line_empty_body  
+  Ô£ô app\Http\Controllers\Api\Admin\StockController.php linÔÇª  
+  Ô£ô app\Http\Requests\Admin\CategoryRequest.php line_endinÔÇª  
+  Ô£ô app\Http\Requests\Admin\MediaUploadRequest.php line_enÔÇª  
+  Ô£ô app\Http\Requests\Admin\ProductImageRequest.php line_eÔÇª  
+  Ô£ô app\Http\Requests\Admin\ProductRequest.php  line_ending  
+  Ô£ô app\Http\Requests\Admin\ProductVariantRequest.php lineÔÇª  
+  Ô£ô app\Http\Requests\Admin\StockAdjustRequest.php line_enÔÇª  
+  Ô£ô app\Http\Resources\MediaResource.php fully_qualified_sÔÇª  
+  Ô£ô app\Http\Resources\ProductImageResource.php fully_qualÔÇª  
+  Ô£ô app\Http\Resources\StockMovementResource.php fully_quaÔÇª  
+  Ô£ô app\Models\Media.php                        line_ending  
+  Ô£ô app\Models\ProductImage.php                 line_ending  
+  Ô£ô app\Models\StockMovement.php                line_ending  
+  Ô£ô app\Policies\CategoryPolicy.php             line_ending  
+  Ô£ô app\Policies\MediaPolicy.php                line_ending  
+  Ô£ô app\Policies\ProductVariantPolicy.php       line_ending  
+  Ô£ô app\Policies\StockMovementPolicy.php        line_ending  
+  Ô£ô app\Services\InventoryService.php line_ending, braces_ÔÇª  
+  Ô£ô app\Services\MediaService.php line_ending, unary_operaÔÇª  
+  Ô£ô database\migrations\2026_09_26_000001_create_media_table.php class_definition, line_ending, braces_position  
+  Ô£ô database\migrations\2026_09_26_000002_create_product_images_table.php class_definition, line_ending, braces_position  
+  Ô£ô database\migrations\2026_09_26_000003_create_stock_movements_table.php class_definition, line_ending, braces_position  
+  Ô£ô tests\Feature\Admin\CategoryCrudTest.php    line_ending  
+  Ô£ô tests\Feature\Admin\MediaUploadTest.php     line_ending  
+  Ô£ô tests\Feature\Admin\ProductCrudTest.php     line_ending  
+  Ô£ô tests\Feature\Admin\ProductImageTest.php    line_ending  
+  Ô£ô tests\Feature\Admin\ProductVariantCrudTest.php line_enÔÇª  
+  Ô£ô tests\Feature\Admin\StockAdjustTest.php     line_ending  
+
+

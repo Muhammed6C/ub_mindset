@@ -2,16 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-  getMorphology,
   getRecommendedSize,
   buildWhatsAppUrl,
 } from './tryOn.js';
-
-test('classifies the visual morphology using the configured thresholds', () => {
-  assert.equal(getMorphology('homme', 180, 62), 'mince');
-  assert.equal(getMorphology('homme', 180, 76), 'athletique');
-  assert.equal(getMorphology('femme', 165, 82), 'costaud');
-});
 
 test('selects an available recommended clothing size and falls back safely', () => {
   assert.equal(getRecommendedSize({ sizes: ['S', 'M', 'L', 'XL'] }, 180, 76), 'M');

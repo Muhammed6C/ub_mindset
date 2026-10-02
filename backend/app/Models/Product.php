@@ -14,18 +14,30 @@ class Product extends Model
     protected $fillable = [
         'category_id',
         'name',
+        'subtitle',
         'slug',
         'description',
+        'tag',
         'price',
+        'original_price',
+        'weight',
         'image',
+        'position',
         'is_active',
         'is_new',
+        'is_featured',
+        'meta_title',
+        'meta_description',
     ];
 
     protected $casts = [
         'price' => 'float',
+        'original_price' => 'float',
+        'weight' => 'float',
+        'position' => 'integer',
         'is_active' => 'boolean',
         'is_new' => 'boolean',
+        'is_featured' => 'boolean',
     ];
 
     public function category(): BelongsTo
@@ -36,5 +48,10 @@ class Product extends Model
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class);
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('position');
     }
 }

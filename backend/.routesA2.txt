@@ -1,0 +1,41 @@
+
+  POST      api/admin/auth/login Api\Admin\AuthController@ÔÇª
+  POST      api/admin/auth/logout Api\Admin\AuthControllerÔÇª
+  GET|HEAD  api/admin/categories Api\Admin\CategoryControlÔÇª
+  POST      api/admin/categories Api\Admin\CategoryControlÔÇª
+  GET|HEAD  api/admin/categories/{category} Api\Admin\CateÔÇª
+  PUT       api/admin/categories/{category} Api\Admin\CateÔÇª
+  DELETE    api/admin/categories/{category} Api\Admin\CateÔÇª
+  GET|HEAD  api/admin/me ...... Api\Admin\AuthController@me
+  GET|HEAD  api/admin/media Api\Admin\MediaController@index
+  POST      api/admin/media Api\Admin\MediaController@store
+  DELETE    api/admin/media/{media} Api\Admin\MediaControlÔÇª
+  GET|HEAD  api/admin/products Api\Admin\ProductControllerÔÇª
+  POST      api/admin/products Api\Admin\ProductControllerÔÇª
+  GET|HEAD  api/admin/products/{product} Api\Admin\ProductÔÇª
+  PUT       api/admin/products/{product} Api\Admin\ProductÔÇª
+  DELETE    api/admin/products/{product} Api\Admin\ProductÔÇª
+  POST      api/admin/products/{product}/images Api\Admin\ÔÇª
+  DELETE    api/admin/products/{product}/images/{image} ApÔÇª
+  GET|HEAD  api/admin/products/{product}/variants Api\AdmiÔÇª
+  POST      api/admin/products/{product}/variants Api\AdmiÔÇª
+  POST      api/admin/stock/adjust Api\Admin\StockControllÔÇª
+  GET|HEAD  api/admin/stock/movements Api\Admin\StockContrÔÇª
+  PUT       api/admin/variants/{variant} Api\Admin\ProductÔÇª
+  DELETE    api/admin/variants/{variant} Api\Admin\ProductÔÇª
+  POST      api/auth/login ....... Api\AuthController@login
+  POST      api/auth/logout ..... Api\AuthController@logout
+  GET|HEAD  api/auth/me ............. Api\AuthController@me
+  GET|HEAD  api/categories ... Api\CategoryController@index
+  GET|HEAD  api/categories/{slug} Api\CategoryController@sÔÇª
+  GET|HEAD  api/health .................. routes/api.php:23
+  GET|HEAD  api/media/{media} Api\Admin\MediaController@shÔÇª
+  POST      api/orders .......... Api\OrderController@store
+  GET|HEAD  api/orders/{orderNumber} Api\OrderController@sÔÇª
+  GET|HEAD  api/products ...... Api\ProductController@index
+  GET|HEAD  api/products/{id} .. Api\ProductController@show
+  GET|HEAD  api/user .................... routes/api.php:56
+
+                                        Showing [36] routes
+
+

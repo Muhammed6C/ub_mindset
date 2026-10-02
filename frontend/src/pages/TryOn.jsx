@@ -1,13 +1,15 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import {
   TRY_ON_CONFIG,
   TRY_ON_PRODUCT_CONFIG,
   buildWhatsAppUrl,
-  getMorphology,
   getRecommendedSize,
 } from '../config/tryOn';
+import { AVATAR_CONFIG } from '../avatar3d/avatarConfig';
+import { computeBodyProfile } from '../avatar3d/bodyProfile';
+import AvatarViewer from '../components/AvatarViewer';
 import './TryOn.css';
 
 function ProductFallback({ label }) {
@@ -16,10 +18,9 @@ function ProductFallback({ label }) {
 
 export default function TryOn() {
   const { cart } = useCart();
-  const [gender, setGender] = useState('homme');
   const [height, setHeight] = useState(TRY_ON_CONFIG.measurements.height.defaultValue);
   const [weight, setWeight] = useState(TRY_ON_CONFIG.measurements.weight.defaultValue);
-  const [mannequinFailed, setMannequinFailed] = useState(false);
+  const [morphology, setMorphology] = useState('athletique');
   const [failedAssets, setFailedAssets] = useState({});
   const [items, setItems] = useState(() => cart
     .filter((item) => TRY_ON_PRODUCT_CONFIG[item.product.id])
@@ -29,39 +30,16 @@ export default function TryOn() {
       selectedSize: item.variant?.size || item.product.sizes?.[0] || null,
     })));
 
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [displayedMorphology, setDisplayedMorphology] = useState(() => getMorphology('homme', TRY_ON_CONFIG.measurements.height.defaultValue, TRY_ON_CONFIG.measurements.weight.defaultValue));
-  const [displayedGender, setDisplayedGender] = useState('homme');
-  const transitionTimeoutRef = useRef(null);
+  const profile = useMemo(
+    () => computeBodyProfile({ heightCm: height, weightKg: weight, morphology }),
+    [height, weight, morphology],
+  );
 
-  const morphology = getMorphology(gender, height, weight);
-  const mannequinSrc = TRY_ON_CONFIG.mannequins[displayedGender][displayedMorphology];
   const activeItems = items.filter((item) => item.enabled);
-  const orderedItems = useMemo(() => [...activeItems].sort((first, second) => (
-    TRY_ON_PRODUCT_CONFIG[first.product.id].category.localeCompare(TRY_ON_PRODUCT_CONFIG[second.product.id].category)
-  )), [activeItems]);
-
-  useEffect(() => {
-    if (morphology !== displayedMorphology || gender !== displayedGender) {
-      setIsTransitioning(true);
-      if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current);
-      transitionTimeoutRef.current = setTimeout(() => {
-        setDisplayedMorphology(morphology);
-        setDisplayedGender(gender);
-        setIsTransitioning(false);
-      }, 300);
-    }
-  }, [morphology, gender, displayedMorphology, displayedGender]);
-
-  useEffect(() => () => {
-    if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current);
-  }, []);
 
   const updateItem = (key, changes) => {
     setItems((current) => current.map((item) => (item.key === key ? { ...item, ...changes } : item)));
   };
-
-  const placementFor = (item) => TRY_ON_CONFIG.placements[displayedGender][displayedMorphology][TRY_ON_PRODUCT_CONFIG[item.product.id].category];
 
   const handleWhatsApp = () => {
     if (activeItems.length) window.open(buildWhatsAppUrl(activeItems), '_blank', 'noopener,noreferrer');
@@ -86,20 +64,6 @@ export default function TryOn() {
       ) : (
         <div className="try-on__layout">
           <section className="try-on__controls" aria-label="Votre profil d'essayage">
-            <div className="try-on__toggle" role="group" aria-label="Silhouette">
-              {['homme', 'femme'].map((value) => (
-                <button
-                  key={value}
-                  className={gender === value ? 'is-active' : ''}
-                  type="button"
-                  aria-pressed={gender === value}
-                  onClick={() => { setGender(value); setMannequinFailed(false); }}
-                >
-                  {value.toUpperCase()}
-                </button>
-              ))}
-            </div>
-
             {Object.entries(TRY_ON_CONFIG.measurements).map(([name, config]) => {
               const value = name === 'height' ? height : weight;
               const setValue = name === 'height' ? setHeight : setWeight;
@@ -120,36 +84,29 @@ export default function TryOn() {
                 </label>
               );
             })}
-            <p className="try-on__morphology">Silhouette estimée <strong>{morphology}</strong></p>
+
+            <p className="try-on__eyebrow">MORPHOLOGIE</p>
+            <div className="try-on__morphologies" role="group" aria-label="Morphologie déclarée">
+              {Object.entries(AVATAR_CONFIG.morphology).map(([key, morph]) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={morphology === key ? 'is-active' : ''}
+                  aria-pressed={morphology === key}
+                  onClick={() => setMorphology(key)}
+                >
+                  {morph.label}
+                </button>
+              ))}
+            </div>
+
+            {profile.warnings.length > 0 && (
+              <p className="try-on__warning" role="status">{profile.warnings.join(' ')}</p>
+            )}
           </section>
 
-          <section className="try-on__stage" aria-label="Aperçu de l'essayage">
-            <div className="try-on__studio">
-              <div className="try-on__shadow" aria-hidden="true" />
-              {!mannequinFailed ? (
-                <img
-                  className={`try-on__mannequin ${isTransitioning ? 'try-on__mannequin--exiting' : 'try-on__mannequin--entering'}`}
-                  src={mannequinSrc}
-                  alt={`Mannequin ${displayedGender} ${displayedMorphology}`}
-                  onError={() => setMannequinFailed(true)}
-                />
-              ) : <div className="try-on__mannequin-fallback" aria-label={`Mannequin ${displayedGender} ${displayedMorphology}`}>{displayedGender === 'homme' ? 'H' : 'F'}</div>}
-              {orderedItems.map((item) => {
-                const productConfig = TRY_ON_PRODUCT_CONFIG[item.product.id];
-                const placement = placementFor(item);
-                const hasFailed = failedAssets[item.key];
-                return hasFailed ? null : (
-                  <img
-                    className={`try-on__garment ${isTransitioning ? 'try-on__garment--exiting' : 'try-on__garment--entering'}`}
-                    key={`${item.key}-${displayedGender}-${displayedMorphology}`}
-                    src={productConfig.asset}
-                    alt=""
-                    style={{ ...placement, transform: 'translateX(-50%)' }}
-                    onError={() => setFailedAssets((current) => ({ ...current, [item.key]: true }))}
-                  />
-                );
-              })}
-            </div>
+          <section className="try-on__stage" aria-label="Aperçu de l'avatar 3D">
+            <AvatarViewer profile={profile} />
           </section>
 
           <section className="try-on__pieces" aria-label="Vos vêtements">
@@ -159,7 +116,7 @@ export default function TryOn() {
               return (
                 <article className={`try-on__piece ${item.enabled ? 'is-enabled' : ''}`} key={item.key}>
                   <button className="try-on__thumbnail" type="button" onClick={() => updateItem(item.key, { enabled: !item.enabled })} aria-pressed={item.enabled} aria-label={`${item.enabled ? 'Retirer' : 'Ajouter'} ${item.product.name}`}>
-                    {failedAssets[item.key] ? <ProductFallback label={item.product.name} /> : <img src={TRY_ON_PRODUCT_CONFIG[item.product.id].asset} alt="" onError={() => setFailedAssets((current) => ({ ...current, [item.key]: true }))} />}
+                    {failedAssets[item.key] || !item.product.image ? <ProductFallback label={item.product.name} /> : <img src={item.product.image} alt="" onError={() => setFailedAssets((current) => ({ ...current, [item.key]: true }))} />}
                   </button>
                   <div className="try-on__piece-details">
                     <h2>{item.product.name}</h2>
