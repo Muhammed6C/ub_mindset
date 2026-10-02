@@ -94,6 +94,67 @@ const KPI_CARDS = [
   },
 ];
 
+const MOCK_DATA = {
+  kpis: {
+    revenue: 2450000,
+    prev_revenue: 1890000,
+    orders: 187,
+    avg_basket: 13101,
+    conv_rate: 3.2,
+  },
+  sales_chart: [
+    { label: '01', revenue: 45000, orders: 3 },
+    { label: '05', revenue: 120000, orders: 8 },
+    { label: '10', revenue: 85000, orders: 6 },
+    { label: '15', revenue: 210000, orders: 14 },
+    { label: '20', revenue: 165000, orders: 11 },
+    { label: '25', revenue: 290000, orders: 19 },
+    { label: '30', revenue: 340000, orders: 23 },
+  ],
+  top_products: [
+    { name: 'Hoodie Oversize Relentless', category: 'UB-LIFT', qty: 45 },
+    { name: 'T-Shirt Signature UB', category: 'UB-BASKET', qty: 38 },
+    { name: 'Sweat Crewneck Unstoppable', category: 'UB-LIFT', qty: 27 },
+    { name: 'Casquette Focus & Conquer', category: 'UB-FOOT', qty: 19 },
+    { name: 'Gourde Isotherme 750ml', category: 'UB-FOOT', qty: 12 },
+  ],
+  size_breakdown: [
+    { size: 'S', qty: 32 },
+    { size: 'M', qty: 58 },
+    { size: 'L', qty: 47 },
+    { size: 'XL', qty: 28 },
+  ],
+  pending_orders: [
+    {
+      id: 1,
+      order_number: 'UB-2026-00187',
+      customer_name: 'Moussa Diallo',
+      customer_phone: '+221 77 123 45 67',
+      shipping_city: 'Dakar',
+      total: 53000,
+      created_at: '2026-10-02T14:30:00',
+    },
+    {
+      id: 2,
+      order_number: 'UB-2026-00186',
+      customer_name: 'Aïcha Ndiaye',
+      customer_phone: '+221 78 987 65 43',
+      shipping_city: 'Paris',
+      total: 35000,
+      created_at: '2026-10-02T11:15:00',
+    },
+    {
+      id: 3,
+      order_number: 'UB-2026-00185',
+      customer_name: 'Jean Kouassi',
+      customer_phone: '+225 07 555 44 33',
+      shipping_city: 'Abidjan',
+      total: 28000,
+      created_at: '2026-10-01T18:45:00',
+    },
+  ],
+};
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [period, setPeriod] = useState('month');
@@ -105,16 +166,9 @@ export default function AdminDashboard() {
   const loadData = useCallback(() => {
     setLoading(true);
     setError('');
-    api.get('/admin/dashboard', { params: { period } })
-      .then((res) => {
-        setData(res.data.data);
-      })
-      .catch((err) => {
-        setError(err?.response?.data?.message || 'Impossible de charger les données du dashboard.');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    // Utilisation directe des données mockées pour la démo
+    setData(MOCK_DATA);
+    setLoading(false);
   }, [period]);
 
   useEffect(() => {
