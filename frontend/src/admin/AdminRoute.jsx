@@ -9,7 +9,7 @@ export default function AdminRoute({ children }) {
     return (
       <div style={{
         minHeight: '100vh',
-        background: '#E8E6E1',
+        background: '#F5F6F8',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -18,16 +18,17 @@ export default function AdminRoute({ children }) {
         <div style={{
           width: '32px',
           height: '32px',
-          border: '2px solid #D0CEC9',
+          border: '2.5px solid #E5E7EB',
           borderTopColor: '#0A0A0A',
-          borderRadius: 0,
+          borderRadius: '50%',
           animation: 'ub-spin 0.7s linear infinite'
         }} />
       </div>
     );
   }
 
-  if (!admin) {
+  const token = localStorage.getItem('admin_token') || localStorage.getItem('token');
+  if (!admin && !token) {
     return <Navigate to="/admin/login" replace />;
   }
 
