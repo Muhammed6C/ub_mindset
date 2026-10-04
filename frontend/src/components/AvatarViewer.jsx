@@ -7,15 +7,25 @@ import { AvatarEngine } from '../avatar3d/engine';
 import { AVATAR_CONFIG } from '../avatar3d/avatarConfig';
 import './AvatarViewer.css';
 
-export default function AvatarViewer({ profile, modelUrl = AVATAR_CONFIG.modelUrl, className = '' }) {
+export default function AvatarViewer({ profile, items = [], appearance, modelUrl = AVATAR_CONFIG.modelUrl, fallbackModelUrl, className = '' }) {
   const containerRef = useRef(null);
   const engineRef = useRef(null);
   const profileRef = useRef(profile);
+  const itemsRef = useRef(items);
+  const appearanceRef = useRef(appearance);
   const [status, setStatus] = useState('loading'); // loading | ready | error
 
   useEffect(() => {
     profileRef.current = profile;
   }, [profile]);
+
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
+
+  useEffect(() => {
+    appearanceRef.current = appearance;
+  }, [appearance]);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,9 +42,16 @@ export default function AvatarViewer({ profile, modelUrl = AVATAR_CONFIG.modelUr
       engineRef.current = engine;
 
       try {
-        await engine.load(modelUrl);
+        try {
+          await engine.load(modelUrl);
+        } catch (error) {
+          if (!fallbackModelUrl) throw error;
+          await engine.load(fallbackModelUrl);
+        }
         if (cancelled) return;
         if (profileRef.current) engine.setBodyProfile(profileRef.current);
+        engine.setOutfit(itemsRef.current);
+        engine.setAppearance(appearanceRef.current);
         setStatus('ready');
       } catch {
         if (!cancelled) setStatus('error');
@@ -48,7 +65,7 @@ export default function AvatarViewer({ profile, modelUrl = AVATAR_CONFIG.modelUr
       if (engine) engine.dispose();
       engineRef.current = null;
     };
-  }, [modelUrl]);
+  }, [modelUrl, fallbackModelUrl]);
 
   useEffect(() => {
     if (engineRef.current && status === 'ready') {
@@ -56,9 +73,18 @@ export default function AvatarViewer({ profile, modelUrl = AVATAR_CONFIG.modelUr
     }
   }, [profile, status]);
 
+  useEffect(() => {
+    if (engineRef.current && status === 'ready') engineRef.current.setOutfit(items);
+  }, [items, status]);
+
+  useEffect(() => {
+    if (engineRef.current && status === 'ready') engineRef.current.setAppearance(appearance);
+  }, [appearance, status]);
+
   return (
     <div className={`avatar-viewer ${className}`.trim()}>
       <div className="avatar-viewer__canvas" ref={containerRef} aria-hidden="true" />
+      {status === 'ready' && <button className="avatar-viewer__reset" type="button" onClick={() => engineRef.current?.resetView()}>FACE</button>}
 
       {status === 'loading' && (
         <div className="avatar-viewer__status" aria-live="polite">Chargement de l'avatar 3D…</div>

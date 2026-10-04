@@ -28,6 +28,22 @@
   color: #b4552e;
 }
 
+.avatar-viewer__reset {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  min-height: 44px;
+  border: 1px solid rgba(0,0,0,.12);
+  border-radius: 8px;
+  background: rgba(250,248,245,.78);
+  color: #1a1a1a;
+  font: 800 .58rem/1 "Archivo Narrow", sans-serif;
+  letter-spacing: .14em;
+  padding: 0 13px;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+
 .avatar-viewer__status small {
   font-size: .55rem;
   letter-spacing: .08em;

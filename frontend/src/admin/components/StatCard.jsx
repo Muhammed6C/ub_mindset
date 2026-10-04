@@ -31,30 +31,36 @@ const ICON_MAP = {
   ),
 };
 
-export default function StatCard({ item }) {
-  const { title, value, evolution, period, icon, sparkline } = item;
+export default function StatCard({ item, index = 0 }) {
+  const { id, title, value, evolution, period, icon, sparkline } = item;
 
-  // Génération d'une courbe SVG sparkline fluide
+  // Sparkline : aire dégradée + ligne + point terminal
   const minVal = Math.min(...sparkline);
   const maxVal = Math.max(...sparkline);
   const range = maxVal - minVal || 1;
-  const width = 80;
-  const height = 28;
+  const width = 78;
+  const height = 26;
 
-  const points = sparkline
-    .map((val, idx) => {
-      const x = (idx / (sparkline.length - 1)) * width;
-      const y = height - ((val - minVal) / range) * (height - 6) - 3;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(' ');
+  const coords = sparkline.map((val, idx) => {
+    const x = (idx / (sparkline.length - 1)) * width;
+    const y = height - ((val - minVal) / range) * (height - 6) - 3;
+    return { x, y };
+  });
+
+  const points = coords.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const areaPoints = `0,${height} ${points} ${width},${height}`;
+  const lastPoint = coords[coords.length - 1];
+  const gradientId = `ub-spark-${id}`;
 
   return (
-    <div className="ub-stat-card">
+    <article className="ub-stat-card">
       <div className="ub-stat-header">
-        <div className="ub-stat-icon-box">
+        <div className="ub-stat-icon-box" aria-hidden="true">
           {ICON_MAP[icon] || ICON_MAP.cart}
         </div>
+        <span className="ub-stat-index" aria-hidden="true">
+          {String(index + 1).padStart(2, '0')}
+        </span>
       </div>
 
       <div className="ub-stat-body">
@@ -73,6 +79,13 @@ export default function StatCard({ item }) {
         {/* Mini sparkline curve */}
         <div className="ub-stat-sparkline">
           <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+            <defs>
+              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#171717" stopOpacity="0.18" />
+                <stop offset="100%" stopColor="#171717" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <polygon points={areaPoints} fill={'url(#' + gradientId + ')'} />
             <polyline
               fill="none"
               stroke="#0A0A0A"
@@ -81,9 +94,10 @@ export default function StatCard({ item }) {
               strokeLinejoin="round"
               points={points}
             />
+            <circle cx={lastPoint.x.toFixed(1)} cy={lastPoint.y.toFixed(1)} r={2.6} fill="#171717" />
           </svg>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

@@ -61,7 +61,7 @@ export default function Collection() {
     <section id="collection" className="collection-section" aria-labelledby="collection-heading">
       <header className="collection-section__header"><p>COLLECTION AH — 2026 · ÉDITION LIMITÉE</p><h2 id="collection-heading">CONÇU POUR<span className="collection-heading-space"> </span><br />PERFORMER.</h2><span>Des pièces pensées pour l’effort, la rue et le podium. Choisis ton terrain.</span></header>
       <div className="collection-section__rails">{COLLECTION_CATEGORIES.map((category) => <CollectionRail key={category.id} category={category} onAddToCart={addProduct} />)}</div>
-      <footer className="collection-section__footer"><Link to="/essayage" className="collection-section__try-on">ESSAYER MES VÊTEMENTS</Link><Link to="/catalog" className="collection-section__cta">VOIR TOUTE LA COLLECTION <span aria-hidden="true">→</span></Link></footer>
+      <footer className="collection-section__footer"><Link to="/essayage" className="collection-section__try-on">CRÉER MON AVATAR</Link><Link to="/catalog" className="collection-section__cta">VOIR TOUTE LA COLLECTION <span aria-hidden="true">→</span></Link></footer>
     </section>
   );
 }

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { AVATAR_GARMENTS } from '../config/avatarExperience';
 
 const DEFAULT_SIZES = ['S', 'M', 'L', 'XL'];
 
 export default function ProductCard({ product, onAddToCart }) {
   const { addToCart } = useCart();
+  const navigate = useNavigate();
   const availableSizes = product.sizes && product.sizes.length > 0 ? product.sizes : DEFAULT_SIZES;
   const [size, setSize] = useState(null);
   const [added, setAdded] = useState(false);
@@ -35,6 +38,15 @@ export default function ProductCard({ product, onAddToCart }) {
     e.preventDefault();
     e.stopPropagation();
     setSize(itemSize);
+  };
+
+  const handleTryOn = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const chosenSize = size || availableSizes[Math.min(1, availableSizes.length - 1)];
+    if (onAddToCart) onAddToCart(product, chosenSize);
+    else addToCart(product, 1, { id: chosenSize, size: chosenSize });
+    navigate('/essayage');
   };
 
   return (
@@ -88,6 +100,7 @@ export default function ProductCard({ product, onAddToCart }) {
           >
             {added ? '✓ AJOUTÉ' : size ? 'AJOUTER' : 'AJOUTER'}
           </button>
+          {AVATAR_GARMENTS[product.id] && <button type="button" className="collection-card__avatar" onClick={handleTryOn}>ESSAYER</button>}
         </div>
       </div>
     </article>

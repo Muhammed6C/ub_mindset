@@ -1,5 +1,6 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 
 const NAV_ITEMS = [
   {
@@ -118,65 +119,92 @@ const NAV_ITEMS = [
   },
 ];
 
-export default function Sidebar({ isOpen, onClose }) {
+const NAV_SECTIONS = [
+  { title: 'Pilotage', routes: ['/admin/dashboard'] },
+  { title: 'Catalogue', routes: ['/admin/products', '/admin/categories', '/admin/stock'] },
+  { title: 'Ventes', routes: ['/admin/orders', '/admin/customers'] },
+  { title: 'Croissance', routes: ['/admin/promotions', '/admin/content'] },
+  { title: 'Système', routes: ['/admin/reports', '/admin/settings'] },
+];
+
+export default function Sidebar({ isOpen, onClose, collapsed }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAdminAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/admin/login');
+  };
 
   return (
-    <aside className={`ub-sidebar ${isOpen ? 'open' : ''}`}>
-      {/* ── Logo UB MINDSET ── */}
+    <aside className={`ub-sidebar ${isOpen ? 'open' : ''} ${collapsed ? 'collapsed' : ''}`}>
+      {/* ── En-tête de marque : logo UB MINDSET ── */}
       <div className="ub-sidebar-brand-wrapper">
-        <NavLink to="/admin/dashboard" className="ub-sidebar-logo-link">
-          <img
-            src="/logo.png"
-            alt="UB MINDSET"
-            className="ub-sidebar-logo-img"
-          />
+        <NavLink
+          to="/admin/dashboard"
+          className="ub-sidebar-logo-link"
+          onClick={() => onClose && onClose()}
+        >
+          <img src="/logo.png" alt="UB Mindset" className="ub-sidebar-logo-img" />
+          {!collapsed && (
+            <span className="ub-sidebar-brand-eyebrow">Administration</span>
+          )}
         </NavLink>
       </div>
 
-      {/* ── Navigation Links ── */}
+      {/* ── Navigation groupée par sections ── */}
       <nav className="ub-sidebar-nav">
-        {NAV_ITEMS.map((item) => {
-          const isActive = location.pathname === item.to || (item.to !== '/admin/dashboard' && location.pathname.startsWith(item.to));
-          return (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={`ub-nav-item ${isActive ? 'active' : ''}`}
-              onClick={() => onClose && onClose()}
-            >
-              <span className="ub-nav-icon">{item.icon}</span>
-              <span className="ub-nav-label">{item.label}</span>
+        {NAV_SECTIONS.map((section) => (
+          <div className="ub-nav-section" key={section.title}>
+            {!collapsed && <p className="ub-nav-section-title">{section.title}</p>}
 
-              {item.badge && (
-                <span className="ub-nav-badge">{item.badge}</span>
-              )}
+            {section.routes.map((route) => {
+              const item = NAV_ITEMS.find((nav) => nav.to === route);
+              if (!item) return null;
 
-              {item.hasSubmenu && !item.badge && (
-                <span className="ub-nav-chevron">›</span>
-              )}
-            </NavLink>
-          );
-        })}
+              const isActive = location.pathname === item.to
+                || (item.to !== '/admin/dashboard' && location.pathname.startsWith(item.to));
+
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={`ub-nav-item ${isActive ? 'active' : ''}`}
+                  onClick={() => onClose && onClose()}
+                  title={collapsed ? item.label : undefined}
+                >
+                  <span className="ub-nav-icon">{item.icon}</span>
+                  {!collapsed && (
+                    <span className="ub-nav-label">{item.label}</span>
+                  )}
+
+                  {item.badge && !collapsed && (
+                    <span className="ub-nav-badge">{item.badge}</span>
+                  )}
+                </NavLink>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
-      {/* ── Bottom Promo Card: "Plus qu'une marque, une mentalité." ── */}
-      <div className="ub-sidebar-promo-card">
-        <div className="ub-promo-bg-overlay" />
-        <div className="ub-promo-content">
-          <div className="ub-promo-logo">
-            <img
-              src="/only-ub.png"
-              alt="UB MINDSET"
-              className="ub-promo-logo-img"
-              style={{ filter: 'brightness(0) invert(1)', width: '40px', height: 'auto' }}
-            />
-          </div>
-          <p className="ub-promo-quote">
-            Plus qu'une marque,<br />
-            une mentalité.
-          </p>
-        </div>
+      {/* ── Bouton de déconnexion ── */}
+      <div className="ub-sidebar-logout-wrapper">
+        <button
+          type="button"
+          className="ub-sidebar-logout-btn"
+          onClick={handleLogout}
+          title="Se déconnecter"
+        >
+          {/* Icône power / logout */}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          {!collapsed && <span>DÉCONNEXION</span>}
+        </button>
       </div>
     </aside>
   );

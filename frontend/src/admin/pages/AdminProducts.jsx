@@ -1,8 +1,62 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  LayoutGrid,
+  List,
+  Package,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+} from 'lucide-react';
 import api from '../../services/api';
 import '../admin.css';
+import { adminDemoCategories, adminDemoProducts } from '../data/adminDemoData';
+import ProductStatCard from '../components/ProductStatCard';
 
 const fmtFCFA = (n) => new Intl.NumberFormat('fr-FR').format(Math.round(n || 0)) + ' FCFA';
+const PAGE_SIZE = 12;
+
+const SORT_OPTIONS = [
+  { value: 'latest', label: 'PLUS RÉCENTS' },
+  { value: 'oldest', label: 'PLUS ANCIENS' },
+  { value: 'price_desc', label: 'PRIX DÉCROISSANT' },
+  { value: 'price_asc', label: 'PRIX CROISSANT' },
+  { value: 'name', label: 'NOM (A → Z)' },
+];
+
+const STATUS_FILTERS = [
+  { value: 'all', label: 'TOUS' },
+  { value: 'active', label: 'ACTIFS' },
+  { value: 'inactive', label: 'INACTIFS' },
+  { value: 'featured', label: 'VEDETTES' },
+];
+
+/** Image principale d'un produit (image directe ou première image de galerie). */
+const productImage = (product) => product?.image || product?.images?.[0]?.url || null;
+
+/** Somme du stock des variantes, ou stock direct du produit. */
+const productStock = (product) => {
+  if (typeof product?.stock === 'number') return product.stock;
+  if (!Array.isArray(product?.variants) || product.variants.length === 0) return null;
+  return product.variants.reduce((sum, variant) => sum + (Number(variant.stock) || 0), 0);
+};
+
+/** Tri local du catalogue (les données sont chargées en une seule requête). */
+const sortProducts = (list, sort) => {
+  const copy = [...list];
+  switch (sort) {
+    case 'oldest':
+      return copy.sort((a, b) => (a.id || 0) - (b.id || 0));
+    case 'price_desc':
+      return copy.sort((a, b) => (b.price || 0) - (a.price || 0));
+    case 'price_asc':
+      return copy.sort((a, b) => (a.price || 0) - (b.price || 0));
+    case 'name':
+      return copy.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    default:
+      return copy.sort((a, b) => (b.id || 0) - (a.id || 0));
+  }
+};
 
 const EMPTY_FORM = {
   name: '',
@@ -18,37 +72,79 @@ const EMPTY_FORM = {
 };
 
 export default function AdminProducts() {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(adminDemoProducts);
+  const [categories, setCategories] = useState(adminDemoCategories);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sort, setSort] = useState('latest');
+  const [view, setView] = useState('grid');
+  const [page, setPage] = useState(1);
   const [modal, setModal] = useState(null); // null | 'create' | 'edit'
   const [form, setForm] = useState(EMPTY_FORM);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [isDemo, setIsDemo] = useState(true);
 
   const loadProducts = useCallback(() => {
-    setLoading(true);
-    const params = {};
-    if (search) params.search = search;
-    api.get('/admin/products', { params })
+    // Le catalogue est chargé en arrière-plan sans bloquer l'affichage immédiat
+    api.get('/admin/products', { params: { per_page: 60 } })
       .then((res) => {
-        setProducts(res.data.data || []);
+        const items = res.data.data || [];
+        if (items.length) {
+          setIsDemo(false);
+          setProducts(items);
+        }
       })
       .catch(() => {
-        setProducts([]);
-      })
-      .finally(() => setLoading(false));
-  }, [search]);
+        // Conserve les données déjà affichées
+      });
+  }, []);
 
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
 
   useEffect(() => {
-    api.get('/admin/categories').then((res) => setCategories(res.data.data || []));
+    api.get('/admin/categories')
+      .then((res) => {
+        if (res.data.data?.length) {
+          setCategories(res.data.data);
+        }
+      })
+      .catch(() => {});
   }, []);
+
+  // Chaque changement de filtre remet la liste à la première page (voir handlers).
+  const filteredProducts = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    const list = products.filter((product) => {
+      const matchesSearch = !query
+        || (product.name || '').toLowerCase().includes(query)
+        || (product.subtitle || '').toLowerCase().includes(query);
+      const matchesCategory = categoryFilter === 'all'
+        || String(product.category?.slug ?? product.category_id ?? '') === String(categoryFilter);
+      const matchesStatus = statusFilter === 'all'
+        || (statusFilter === 'active' && product.is_active)
+        || (statusFilter === 'inactive' && !product.is_active)
+        || (statusFilter === 'featured' && product.is_featured);
+      return matchesSearch && matchesCategory && matchesStatus;
+    });
+    return sortProducts(list, sort);
+  }, [products, search, categoryFilter, statusFilter, sort]);
+
+  const stats = useMemo(() => ({
+    total: filteredProducts.length,
+    active: filteredProducts.filter((product) => product.is_active).length,
+    inactive: filteredProducts.filter((product) => !product.is_active).length,
+    featured: filteredProducts.filter((product) => product.is_featured).length,
+  }), [filteredProducts]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pageItems = filteredProducts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const openCreate = () => {
     setForm(EMPTY_FORM);
@@ -86,6 +182,13 @@ export default function AdminProducts() {
         category_id: form.category_id ? parseInt(form.category_id) : null,
       };
 
+      if (isDemo) {
+        const category = categories.find((item) => item.id === payload.category_id) || null;
+        const demoProduct = { ...payload, id: editing?.id || Date.now(), category };
+        setProducts((current) => modal === 'create' ? [demoProduct, ...current] : current.map((item) => item.id === editing.id ? demoProduct : item));
+        setModal(null);
+        return;
+      }
       if (modal === 'create') {
         await api.post('/admin/products', payload);
       } else {
@@ -104,6 +207,10 @@ export default function AdminProducts() {
   const handleDelete = async (p) => {
     if (!confirm(`Supprimer définitivement le produit "${p.name}" ?`)) return;
     try {
+      if (isDemo) {
+        setProducts((current) => current.filter((item) => item.id !== p.id));
+        return;
+      }
       await api.delete(`/admin/products/${p.id}`);
       loadProducts();
     } catch (err) {
@@ -111,119 +218,274 @@ export default function AdminProducts() {
     }
   };
 
+  const resetFilters = () => {
+    setSearch('');
+    setCategoryFilter('all');
+    setStatusFilter('all');
+    setSort('latest');
+    setPage(1);
+  };
+
+  const hasActiveFilters = Boolean(search) || categoryFilter !== 'all' || statusFilter !== 'all' || sort !== 'latest';
+
   return (
     <div className="admin-page">
-      {/* ── Entête de page ── */}
-      <div className="admin-page-header">
+      {/* ── En-tête éditorial ── */}
+      <header className="ub-admin-page-lead">
         <div>
-          <p className="admin-page-eyebrow">CATALOGUE DE LA MARQUE</p>
-          <h1 className="admin-page-title">PRODUITS</h1>
+          <p>UB MINDSET / CATALOGUE</p>
+          <h1>PRODUITS</h1>
+          <span>Pilote le catalogue : prix, statut, mise en avant et disponibilité en un coup d'œil.</span>
         </div>
-        <button
-          type="button"
-          className="admin-btn admin-btn-primary"
-          onClick={openCreate}
-        >
-          AJOUTER UN PRODUIT
-        </button>
-      </div>
+        <div className="ub-admin-page-lead__actions">
+          <button type="button" className="is-dark" onClick={openCreate}>
+            <Plus size={16} aria-hidden="true" />
+            AJOUTER UN PRODUIT
+          </button>
+        </div>
+      </header>
 
-      {/* ── Barre de recherche ── */}
-      <div style={{ marginBottom: '28px' }}>
-        <input
-          className="admin-input"
-          style={{ maxWidth: '340px' }}
-          placeholder="RECHERCHER DANS LE CATALOGUE…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+      {isDemo && (
+        <p className="admin-demo-notice">APERÇU DE DÉMONSTRATION · MODIFICATIONS LOCALES UNIQUEMENT</p>
+      )}
+
+      {/* ── Synthèse du catalogue — KPIs animés comme le dashboard ── */}
+      <section className="admin-products-stats" aria-label="Synthèse du catalogue">
+        <ProductStatCard
+          icon="package"
+          value={stats.total}
+          label="PRODUITS LISTÉS"
+          trend="+12%"
+          period="ce mois"
+          index={0}
         />
+        <ProductStatCard
+          icon="check"
+          value={stats.active}
+          label="ACTIFS"
+          trend="+8%"
+          period="ce mois"
+          index={1}
+        />
+        <ProductStatCard
+          icon="x"
+          value={stats.inactive}
+          label="INACTIFS"
+          trend="-3%"
+          period="ce mois"
+          index={2}
+        />
+        <ProductStatCard
+          icon="star"
+          value={stats.featured}
+          label="VEDETTES"
+          trend="+15%"
+          period="ce mois"
+          index={3}
+        />
+      </section>
+
+      {/* ── Barre d'outils ── */}
+      <section className="admin-products-toolbar">
+        <div className="admin-products-search">
+          <Search size={16} aria-hidden="true" />
+          <input
+            className="admin-input"
+            placeholder="RECHERCHER UN PRODUIT…"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          />
+        </div>
+        <select className="admin-select" value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}>
+          <option value="all">TOUTES LES CATÉGORIES</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.slug || category.id}>
+              {(category.name || '').toUpperCase()}
+            </option>
+          ))}
+        </select>
+        <select className="admin-select" value={sort} onChange={(e) => { setSort(e.target.value); setPage(1); }}>
+          {SORT_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
+        </select>
+        <div className="admin-products-viewtoggle" role="group" aria-label="Mode d'affichage">
+          <button type="button" className={view === 'grid' ? 'active' : ''} onClick={() => { setView('grid'); setPage(1); }} aria-label="Vue grille">
+            <LayoutGrid size={16} aria-hidden="true" />
+          </button>
+          <button type="button" className={view === 'table' ? 'active' : ''} onClick={() => { setView('table'); setPage(1); }} aria-label="Vue tableau">
+            <List size={16} aria-hidden="true" />
+          </button>
+        </div>
+      </section>
+
+      {/* ── Filtres rapides de statut ── */}
+      <div className="admin-products-statusbar" role="group" aria-label="Filtrer par statut">
+        {STATUS_FILTERS.map((filter) => (
+          <button
+            key={filter.value}
+            type="button"
+            className={`admin-products-pill ${statusFilter === filter.value ? 'active' : ''}`}
+            onClick={() => { setStatusFilter(filter.value); setPage(1); }}
+          >
+            {filter.label}
+          </button>
+        ))}
       </div>
 
-      {/* ── Tableau des produits ── */}
-      <div className="admin-table-wrap">
-        {loading ? (
-          <div className="admin-spinner">
-            <div className="admin-spinner-ring" />
-          </div>
-        ) : products.length === 0 ? (
-          <div className="admin-empty">
-            <p className="admin-empty-label">AUCUN PRODUIT DISPONIBLE</p>
-            <p className="admin-empty-desc">
-              {search ? 'Aucun produit ne correspond à votre recherche.' : 'Commencez par ajouter votre premier produit.'}
-            </p>
-          </div>
-        ) : (
-          <table className="admin-table">
+      {/* ── Liste des produits ── */}
+      {loading ? (
+        <div className="admin-spinner">
+          <div className="admin-spinner-ring" />
+        </div>
+      ) : pageItems.length === 0 ? (
+        <div className="admin-empty">
+          <p className="admin-empty-label">AUCUN PRODUIT</p>
+          <p className="admin-empty-desc">
+            {hasActiveFilters
+              ? 'Aucun produit ne correspond aux filtres sélectionnés.'
+              : 'Commence par ajouter ton premier produit au catalogue.'}
+          </p>
+          {hasActiveFilters && (
+            <button type="button" className="admin-btn admin-btn-ghost" onClick={resetFilters}>
+              RÉINITIALISER LES FILTRES
+            </button>
+          )}
+        </div>
+      ) : view === 'grid' ? (
+        <div className="admin-products-grid">
+          {pageItems.map((product) => {
+            const stock = productStock(product);
+            return (
+              <article className="admin-product-card" key={product.id}>
+                <div className="admin-product-card__media">
+                  {productImage(product) ? (
+                    <img src={productImage(product)} alt={product.name} loading="lazy" />
+                  ) : (
+                    <span className="admin-product-card__placeholder"><Package size={30} aria-hidden="true" /></span>
+                  )}
+                  <div className="admin-product-card__badges">
+                    <span className={`admin-badge ${product.is_active ? 'admin-badge-active' : 'admin-badge-inactive'}`}>
+                      {product.is_active ? 'ACTIF' : 'INACTIF'}
+                    </span>
+                    {product.is_new && <span className="admin-badge admin-badge-new">NOUVEAU</span>}
+                    {product.is_featured && <span className="admin-badge admin-badge-featured">VEDETTE</span>}
+                  </div>
+                </div>
+                <div className="admin-product-card__body">
+                  <span className="admin-product-card__cat">{product.category?.name || 'SANS CATÉGORIE'}</span>
+                  <h3 className="admin-product-card__name">{product.name}</h3>
+                  {product.subtitle && <span className="admin-product-card__sub">{product.subtitle}</span>}
+                  <div className="admin-product-card__row">
+                    <span className="admin-product-card__price">
+                      {fmtFCFA(product.price)}
+                      {product.original_price && (
+                        <span className="admin-product-card__price-old">{fmtFCFA(product.original_price)}</span>
+                      )}
+                    </span>
+                    {stock !== null && (
+                      <span className={`admin-product-card__stock ${stock === 0 ? 'out' : stock <= 5 ? 'low' : ''}`}>
+                        <Package size={13} aria-hidden="true" /> {stock} EN STOCK
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="admin-product-card__actions">
+                  <button type="button" onClick={() => openEdit(product)}>
+                    <Pencil size={14} aria-hidden="true" /> ÉDITER
+                  </button>
+                  <button type="button" className="is-danger" onClick={() => handleDelete(product)}>
+                    <Trash2 size={14} aria-hidden="true" /> SUPPRIMER
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="admin-table-wrap">
+          <table className="admin-table admin-products-table">
             <thead>
               <tr>
                 <th>PRODUIT</th>
                 <th>CATÉGORIE</th>
                 <th>PRIX</th>
+                <th>STOCK</th>
                 <th>STATUT</th>
-                <th>BADGES & LABELS</th>
                 <th style={{ textAlign: 'right' }}>ACTIONS</th>
               </tr>
             </thead>
             <tbody>
-              {products.map((p) => (
-                <tr key={p.id}>
-                  <td>
-                    <div style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                      {p.name}
-                    </div>
-                    {p.subtitle && (
-                      <div style={{ fontSize: '0.72rem', color: '#8C8C8C', marginTop: 2 }}>
-                        {p.subtitle}
+              {pageItems.map((product) => {
+                const stock = productStock(product);
+                return (
+                  <tr key={product.id}>
+                    <td>
+                      <div className="admin-product-cell">
+                        {productImage(product) ? (
+                          <img className="admin-product-thumb" src={productImage(product)} alt={product.name} loading="lazy" />
+                        ) : (
+                          <span className="admin-product-thumb admin-product-thumb--empty"><Package size={18} aria-hidden="true" /></span>
+                        )}
+                        <div>
+                          <div className="admin-product-cell__name">{product.name}</div>
+                          {product.subtitle && <div className="admin-product-cell__sub">{product.subtitle}</div>}
+                        </div>
                       </div>
-                    )}
-                  </td>
-                  <td style={{ color: '#8C8C8C', fontWeight: 600 }}>
-                    {p.category?.name || 'SANS CATÉGORIE'}
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 800 }}>{fmtFCFA(p.price)}</span>
-                    {p.original_price && (
-                      <span style={{ textDecoration: 'line-through', color: '#8C8C8C', fontSize: '0.75rem', marginLeft: 8 }}>
-                        {fmtFCFA(p.original_price)}
+                    </td>
+                    <td className="admin-products-table__muted">{product.category?.name || 'SANS CATÉGORIE'}</td>
+                    <td>
+                      <span className="admin-product-cell__name">{fmtFCFA(product.price)}</span>
+                      {product.original_price && (
+                        <span className="admin-product-card__price-old">{fmtFCFA(product.original_price)}</span>
+                      )}
+                    </td>
+                    <td className="admin-products-table__muted">{stock === null ? '—' : stock}</td>
+                    <td>
+                      <span className={`admin-badge ${product.is_active ? 'admin-badge-active' : 'admin-badge-inactive'}`}>
+                        {product.is_active ? 'ACTIF' : 'INACTIF'}
                       </span>
-                    )}
-                  </td>
-                  <td>
-                    <span className={`admin-badge ${p.is_active ? 'admin-badge-active' : 'admin-badge-inactive'}`}>
-                      {p.is_active ? 'ACTIF' : 'INACTIF'}
-                    </span>
-                  </td>
-                  <td>
-                    <span style={{ fontSize: '0.68rem', color: '#8C8C8C', fontWeight: 700, letterSpacing: '0.1em' }}>
-                      {[p.is_new && 'NOUVEAU', p.is_featured && 'VEDETTE', p.tag].filter(Boolean).join(' · ') || '—'}
-                    </span>
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'inline-flex', gap: 8 }}>
-                      <button
-                        type="button"
-                        className="admin-btn admin-btn-ghost"
-                        style={{ padding: '8px 14px', fontSize: '0.58rem' }}
-                        onClick={() => openEdit(p)}
-                      >
-                        ÉDITER
-                      </button>
-                      <button
-                        type="button"
-                        className="admin-btn admin-btn-danger"
-                        style={{ padding: '8px 12px', fontSize: '0.58rem' }}
-                        onClick={() => handleDelete(p)}
-                      >
-                        SUPPRIMER
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td>
+                      <div className="admin-products-table__actions">
+                        <button type="button" className="admin-icon-btn" onClick={() => openEdit(product)} aria-label="Éditer">
+                          <Pencil size={15} aria-hidden="true" />
+                        </button>
+                        <button type="button" className="admin-icon-btn is-danger" onClick={() => handleDelete(product)} aria-label="Supprimer">
+                          <Trash2 size={15} aria-hidden="true" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* ── Pagination ── */}
+      {!loading && totalPages > 1 && (
+        <div className="admin-products-pagination">
+          <span className="admin-products-pagination__info">
+            {filteredProducts.length} PRODUIT{filteredProducts.length > 1 ? 'S' : ''} · PAGE {currentPage} / {totalPages}
+          </span>
+          <div className="admin-products-pagination__controls">
+            <button type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage <= 1}>‹ PRÉC.</button>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => (
+              <button
+                key={number}
+                type="button"
+                className={number === currentPage ? 'active' : ''}
+                onClick={() => setPage(number)}
+              >
+                {number}
+              </button>
+            ))}
+            <button type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage >= totalPages}>SUIV. ›</button>
+          </div>
+        </div>
+      )}
 
       {/* ── Modale Création / Édition Produit ── */}
       {modal && (
@@ -232,12 +494,24 @@ export default function AdminProducts() {
           onClick={(e) => e.target === e.currentTarget && setModal(null)}
         >
           <div className="admin-modal">
-            <p className="admin-modal-eyebrow">
-              {modal === 'create' ? 'NOUVEAU PRODUIT' : 'MODIFICATION PRODUIT'}
-            </p>
-            <h2 className="admin-modal-title">
-              {modal === 'create' ? 'AJOUT AU CATALOGUE' : editing?.name}
-            </h2>
+            <div className="admin-modal-header">
+              <div>
+                <p className="admin-modal-eyebrow">
+                  {modal === 'create' ? 'NOUVEAU PRODUIT' : 'MODIFICATION PRODUIT'}
+                </p>
+                <h2 className="admin-modal-title">
+                  {modal === 'create' ? 'AJOUT AU CATALOGUE' : editing?.name}
+                </h2>
+              </div>
+              <button
+                type="button"
+                className="admin-modal-close"
+                onClick={() => setModal(null)}
+                aria-label="Fermer"
+              >
+                ✕
+              </button>
+            </div>
 
             {error && <div className="admin-alert-error">{error}</div>}
 

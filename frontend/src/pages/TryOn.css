@@ -169,6 +169,41 @@
   margin-top: 10px;
 }
 
+.try-on__avatar-profiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 10px 0 22px;
+}
+
+.try-on__avatar-profiles button,
+.try-on__option-group button {
+  min-height: 44px;
+  border: 1px solid #c9c6bf;
+  border-radius: 8px;
+  background: transparent;
+  color: #6a6560;
+  font: 700 .58rem/1 "Archivo Narrow", sans-serif;
+  letter-spacing: .1em;
+  cursor: pointer;
+}
+
+.try-on__avatar-profiles button.is-active,
+.try-on__option-group button.is-active {
+  background: #1a1a1a;
+  border-color: #1a1a1a;
+  color: #f5f1ef;
+}
+
+.try-on__subheading { margin-top: 24px; }
+
+.try-on__option-group { margin-top: 14px; }
+.try-on__option-group > span { display: block; margin-bottom: 8px; color: #6a6560; font: 700 .56rem/1 "Archivo Narrow", sans-serif; letter-spacing: .14em; }
+.try-on__option-group > div { display: flex; flex-wrap: wrap; gap: 6px; }
+.try-on__option-group button { padding: 0 11px; }
+.try-on__option-group[aria-label="Teint"] button { width: 44px; padding: 0; background: var(--tone); border-radius: 50%; color: transparent; }
+.try-on__option-group[aria-label="Teint"] button.is-active { outline: 2px solid #1a1a1a; outline-offset: 2px; border-color: #f5f1ef; }
+
 .try-on__morphologies button {
   min-height: 44px;
   border: 1px solid #c9c6bf;
@@ -204,10 +239,16 @@
   background: radial-gradient(ellipse at 50% 22%, rgba(255,255,255,.75), rgba(232,228,222,.55));
 }
 
+.try-on__avatar-notice { position: absolute; left: 14px; right: 14px; bottom: 14px; margin: 0; padding: 9px 12px; border-radius: 8px; background: rgba(250,248,245,.8); color: #5a5550; font: 700 .54rem/1.4 "Archivo Narrow", sans-serif; letter-spacing: .12em; text-align: center; }
+
 .try-on__pieces {
   display: grid;
   gap: 10px;
 }
+
+.try-on__empty-pieces { min-height: 120px; display: grid; place-content: center; gap: 12px; text-align: center; color: #8a8580; font: 700 .58rem/1.5 "Archivo Narrow", sans-serif; letter-spacing: .12em; }
+.try-on__empty-pieces p { margin: 0; }
+.try-on__empty-pieces a { color: #1a1a1a; text-decoration: underline; text-underline-offset: 4px; }
 
 .try-on__piece {
   display: flex;

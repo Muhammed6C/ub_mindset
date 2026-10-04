@@ -9,6 +9,13 @@ import {
 } from '../config/tryOn';
 import { AVATAR_CONFIG } from '../avatar3d/avatarConfig';
 import { computeBodyProfile } from '../avatar3d/bodyProfile';
+import {
+  AVATAR_EXPERIENCE_CONFIG,
+  AVATAR_OPTIONS,
+  AVATAR_PROFILES,
+  getLayeredAvatarItems,
+  getRenderableAvatar,
+} from '../config/avatarExperience';
 import AvatarViewer from '../components/AvatarViewer';
 import './TryOn.css';
 
@@ -21,6 +28,16 @@ export default function TryOn() {
   const [height, setHeight] = useState(TRY_ON_CONFIG.measurements.height.defaultValue);
   const [weight, setWeight] = useState(TRY_ON_CONFIG.measurements.weight.defaultValue);
   const [morphology, setMorphology] = useState('athletique');
+  const [avatar, setAvatar] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem(AVATAR_EXPERIENCE_CONFIG.storageKey));
+      return stored?.version === AVATAR_EXPERIENCE_CONFIG.storageVersion
+        ? { ...AVATAR_EXPERIENCE_CONFIG.defaultProfile, ...stored.profile }
+        : AVATAR_EXPERIENCE_CONFIG.defaultProfile;
+    } catch {
+      return AVATAR_EXPERIENCE_CONFIG.defaultProfile;
+    }
+  });
   const [failedAssets, setFailedAssets] = useState({});
   const [items, setItems] = useState(() => cart
     .filter((item) => TRY_ON_PRODUCT_CONFIG[item.product.id])
@@ -36,6 +53,17 @@ export default function TryOn() {
   );
 
   const activeItems = items.filter((item) => item.enabled);
+  const layeredItems = useMemo(() => getLayeredAvatarItems(items), [items]);
+  const renderableAvatar = useMemo(() => getRenderableAvatar(avatar.avatarId), [avatar.avatarId]);
+  const appearance = useMemo(() => ({ skinTone: AVATAR_OPTIONS.skinTones.find((tone) => tone.id === avatar.skinTone)?.color }), [avatar.skinTone]);
+
+  const updateAvatar = (changes) => {
+    setAvatar((current) => {
+      const next = { ...current, ...changes };
+      localStorage.setItem(AVATAR_EXPERIENCE_CONFIG.storageKey, JSON.stringify({ version: AVATAR_EXPERIENCE_CONFIG.storageVersion, profile: next }));
+      return next;
+    });
+  };
 
   const updateItem = (key, changes) => {
     setItems((current) => current.map((item) => (item.key === key ? { ...item, ...changes } : item)));
@@ -55,15 +83,13 @@ export default function TryOn() {
         </div>
       </header>
 
-      {!items.length ? (
-        <section className="try-on__empty">
-          <p className="try-on__eyebrow">AUCUNE PIÈCE SÉLECTIONNÉE</p>
-          <h2>Choisissez une pièce de la collection pour commencer.</h2>
-          <Link className="try-on__primary-link" to="/#collection">VOIR LA COLLECTION</Link>
-        </section>
-      ) : (
-        <div className="try-on__layout">
+      <div className="try-on__layout">
           <section className="try-on__controls" aria-label="Votre profil d'essayage">
+            <p className="try-on__eyebrow">CHOISIS TON AVATAR</p>
+            <div className="try-on__avatar-profiles" role="group" aria-label="Profil de mannequin">
+              {AVATAR_PROFILES.map((avatarProfile) => <button key={avatarProfile.id} type="button" className={avatar.avatarId === avatarProfile.id ? 'is-active' : ''} aria-pressed={avatar.avatarId === avatarProfile.id} onClick={() => updateAvatar({ avatarId: avatarProfile.id })}>{avatarProfile.label}</button>)}
+            </div>
+
             {Object.entries(TRY_ON_CONFIG.measurements).map(([name, config]) => {
               const value = name === 'height' ? height : weight;
               const setValue = name === 'height' ? setHeight : setWeight;
@@ -100,17 +126,26 @@ export default function TryOn() {
               ))}
             </div>
 
+            <p className="try-on__eyebrow try-on__subheading">PERSONNALISATION</p>
+            <div className="try-on__option-group" role="group" aria-label="Teint">
+              <span>TEINT</span>
+              <div>{AVATAR_OPTIONS.skinTones.map((tone) => <button key={tone.id} type="button" className={avatar.skinTone === tone.id ? 'is-active' : ''} aria-label={tone.label} aria-pressed={avatar.skinTone === tone.id} onClick={() => updateAvatar({ skinTone: tone.id })} style={{ '--tone': tone.color }} />)}</div>
+            </div>
+            {['hairstyles', 'styles'].map((optionKey) => <div className="try-on__option-group" key={optionKey} role="group" aria-label={optionKey === 'hairstyles' ? 'Coiffure' : 'Style'}><span>{optionKey === 'hairstyles' ? 'COIFFURE' : 'STYLE'}</span><div>{AVATAR_OPTIONS[optionKey].map((option) => <button key={option.id} type="button" className={avatar[optionKey === 'hairstyles' ? 'hairstyle' : 'style'] === option.id ? 'is-active' : ''} aria-pressed={avatar[optionKey === 'hairstyles' ? 'hairstyle' : 'style'] === option.id} onClick={() => updateAvatar({ [optionKey === 'hairstyles' ? 'hairstyle' : 'style']: option.id })}>{option.label}</button>)}</div></div>)}
+
             {profile.warnings.length > 0 && (
               <p className="try-on__warning" role="status">{profile.warnings.join(' ')}</p>
             )}
           </section>
 
           <section className="try-on__stage" aria-label="Aperçu de l'avatar 3D">
-            <AvatarViewer profile={profile} />
+            <AvatarViewer profile={profile} items={layeredItems} appearance={appearance} modelUrl={renderableAvatar.resolvedModelUrl || renderableAvatar.modelUrl} fallbackModelUrl={renderableAvatar.fallbackModelUrl} />
+            {renderableAvatar.status === 'demo' && <p className="try-on__avatar-notice" role="status">APERÇU {renderableAvatar.label} — MODÈLE FINAL À AJOUTER</p>}
           </section>
 
           <section className="try-on__pieces" aria-label="Vos vêtements">
             <p className="try-on__eyebrow">VOS PIÈCES</p>
+            {!items.length && <div className="try-on__empty-pieces"><p>AUCUNE PIÈCE SÉLECTIONNÉE</p><Link to="/#collection">CHOISIR DES VÊTEMENTS</Link></div>}
             {items.map((item) => {
               const suggested = getRecommendedSize(item.product, height, weight);
               return (
@@ -129,8 +164,7 @@ export default function TryOn() {
               );
             })}
           </section>
-        </div>
-      )}
+      </div>
 
       {items.length > 0 && <footer className="try-on__order-bar">
         <p><strong>{activeItems.length}</strong> ARTICLE{activeItems.length > 1 ? 'S' : ''}<span>{activeItems.map((item) => item.selectedSize).filter(Boolean).join(' · ')}</span></p>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" role="img" aria-label="Placeholder Dakar Paris">
+  <defs><linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b99368"/><stop offset=".5" stop-color="#70594c"/><stop offset="1" stop-color="#211f20"/></linearGradient></defs>
+  <rect width="1200" height="1600" fill="url(#sky)"/>
+  <circle cx="895" cy="272" r="130" fill="#e3cba4" opacity=".7"/>
+  <path d="M0 1100 210 960l120 88 180-188 132 186 154-286 184 250 170-118v708H0Z" fill="#171719" opacity=".8"/>
+  <path d="M290 1250c48-300 148-455 245-455s197 155 245 455" fill="#050505"/>
+  <circle cx="535" cy="690" r="95" fill="#050505"/>
+  <text x="70" y="1480" fill="#f2f1ef" font-family="Arial,sans-serif" font-size="28" font-weight="700" letter-spacing="9">IMAGE À REMPLACER — DAKAR / PARIS</text>
+</svg>

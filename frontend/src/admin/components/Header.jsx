@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 
-export default function Header({ onMenuClick }) {
+export default function Header({ onMenuClick, onToggleSidebar, sidebarCollapsed }) {
   const { admin, logout } = useAdminAuth();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -27,6 +27,34 @@ export default function Header({ onMenuClick }) {
           <line x1="3" y1="12" x2="21" y2="12" />
           <line x1="3" y1="6" x2="21" y2="6" />
           <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+
+      {/* ── Toggle Sidebar (desktop) ── */}
+      <button
+        type="button"
+        className="ub-header-toggle-btn"
+        onClick={onToggleSidebar}
+        aria-label={sidebarCollapsed ? 'Développer la barre latérale' : 'Réduire la barre latérale'}
+        title={sidebarCollapsed ? 'Développer la barre latérale' : 'Réduire la barre latérale'}
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{
+            transform: sidebarCollapsed ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+          }}
+        >
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="9" y1="3" x2="9" y2="21" />
+          <polyline points="13 8 15 12 13 16" />
         </svg>
       </button>
 

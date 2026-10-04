@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import HeroBanner from '../components/HeroBanner';
 import StatCard from '../components/StatCard';
 import SalesChart from '../components/SalesChart';
@@ -6,8 +7,6 @@ import PopularProducts from '../components/PopularProducts';
 import RecentOrders from '../components/RecentOrders';
 import LowStock from '../components/LowStock';
 import LatestProducts from '../components/LatestProducts';
-import SalesDistribution from '../components/SalesDistribution';
-import MarketingBanner from '../components/MarketingBanner';
 import { kpiStats } from '../data/dashboardMockData';
 
 export default function AdminDashboard() {
@@ -18,6 +17,17 @@ export default function AdminDashboard() {
 
   return (
     <div className="ub-dashboard-root">
+      <header className="ub-admin-page-lead">
+        <div>
+          <p>UB MINDSET / PERFORMANCE STUDIO</p>
+          <h1>VUE D’ENSEMBLE</h1>
+          <span>Les signaux essentiels de la marque, avec le rythme de la communauté.</span>
+        </div>
+        <div className="ub-admin-page-lead__actions">
+          <Link to="/admin/orders">VOIR LES COMMANDES</Link>
+          <Link to="/admin/products" className="is-dark">GÉRER LE CATALOGUE <span aria-hidden="true">→</span></Link>
+        </div>
+      </header>
       {/* ── Main Dashboard Grid (Left Columns + Right Column) ── */}
       <div className="ub-dashboard-layout-grid">
         {/* ─── LEFT MAIN SECTION ─── */}
@@ -27,8 +37,8 @@ export default function AdminDashboard() {
 
           {/* 2. 4 KPI Stat Cards */}
           <div className="ub-kpi-grid-row">
-            {kpiStats.map((stat) => (
-              <StatCard key={stat.id} item={stat} />
+            {kpiStats.map((stat, index) => (
+              <StatCard key={stat.id} item={stat} index={index} />
             ))}
           </div>
 
@@ -42,14 +52,9 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* 4. Bottom Row: LatestProducts + SalesDistribution */}
-          <div className="ub-bottom-grid-row">
-            <div className="ub-bottom-left">
-              <LatestProducts />
-            </div>
-            <div className="ub-bottom-right">
-              <SalesDistribution />
-            </div>
+          {/* 4. Catalogue récemment enrichi */}
+          <div className="ub-dashboard-latest-row">
+            <LatestProducts />
           </div>
         </div>
 
@@ -61,8 +66,6 @@ export default function AdminDashboard() {
           {/* 6. Stock faible */}
           <LowStock />
 
-          {/* 7. Bannière Marketing Collection Automne-Hiver */}
-          <MarketingBanner />
         </div>
       </div>
     </div>

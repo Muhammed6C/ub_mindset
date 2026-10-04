@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { COLLECTION_CATEGORIES } from '../config/collection';
 import ProductCard from '../components/ProductCard';
 import { useCart } from '../context/CartContext';
@@ -16,6 +17,7 @@ export default function Catalog() {
         <p>UB MINDSET — COLLECTION AH 2026</p>
         <h1>TOUTE LA<br />COLLECTION.</h1>
         <span>Choisis ton terrain. Garde le même mindset.</span>
+        <Link className="catalog-page__avatar-link" to="/essayage">ESSAYER SUR MON AVATAR <span aria-hidden="true">→</span></Link>
       </header>
 
       {COLLECTION_CATEGORIES.map((category) => (

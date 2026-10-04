@@ -1,0 +1,18 @@
+.cart-page { min-height: 100dvh; background: #f2ede4; color: #171717; padding: 132px max(20px, calc((100vw - 960px) / 2)) 120px; }
+.cart-page header p, .cart-page__empty, .cart-page__footer span, .cart-line p { font: 800 .62rem/1.5 "Archivo Narrow", sans-serif; letter-spacing: .16em; text-transform: uppercase; }
+.cart-page header h1 { margin: 14px 0 48px; font: 900 clamp(3rem, 10vw, 7rem)/.82 Archivo, sans-serif; letter-spacing: -.06em; }
+.cart-page__items { border-top: 1px solid rgba(0,0,0,.15); }
+.cart-line { display: grid; grid-template-columns: 82px 1fr 44px; gap: 14px; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(0,0,0,.1); }
+.cart-line img { width: 82px; height: 104px; object-fit: cover; background: #ddd6ca; }
+.cart-line h2 { margin: 0 0 8px; font: 800 .78rem/1.2 Archivo, sans-serif; letter-spacing: .03em; }
+.cart-line p { margin: 0; color: #716b64; font-size: .55rem; }
+.cart-line__quantity { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+.cart-line__quantity button, .cart-line__remove { min-width: 36px; min-height: 36px; border: 1px solid rgba(0,0,0,.16); background: transparent; border-radius: 50%; cursor: pointer; }
+.cart-line__remove { color: #74514a; font-size: 1.3rem; }
+.cart-page__footer { display: grid; gap: 14px; margin-top: 30px; }
+.cart-page__footer p { display: flex; justify-content: space-between; align-items: center; margin: 0; }
+.cart-page__footer strong { font: 900 1.35rem Archivo, sans-serif; }
+.cart-page__footer a, .cart-page__empty a { min-height: 56px; display: inline-flex; justify-content: center; align-items: center; gap: 12px; background: #171717; color: #f7f3ed; padding: 0 20px; text-decoration: none; font: 800 .66rem/1 "Archivo Narrow", sans-serif; letter-spacing: .13em; }
+.cart-page__empty { display: grid; gap: 22px; place-items: start; min-height: 40vh; }
+.cart-page__empty p { margin: 0; }
+@media (min-width: 720px) { .cart-line { grid-template-columns: 110px 1fr 52px; gap: 22px; }.cart-line img { width: 110px; height: 138px; }.cart-page__footer { grid-template-columns: 1fr 320px; align-items: center; } }

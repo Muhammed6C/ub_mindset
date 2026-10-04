@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import api from '../../services/api';
 import '../admin.css';
+import { adminDemoOrders } from '../data/adminDemoData';
 
 const fmtFCFA = (n) => new Intl.NumberFormat('fr-FR').format(Math.round(n || 0)) + ' FCFA';
 
@@ -30,16 +31,17 @@ const STATUS_MAP = {
 };
 
 export default function AdminOrders() {
-  const [orders, setOrders] = useState([]);
-  const [meta, setMeta] = useState(null);
+  const [orders, setOrders] = useState(adminDemoOrders);
+  const [meta, setMeta] = useState({ current_page: 1, last_page: 1 });
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
   const [newStatus, setNewStatus] = useState('');
   const [updating, setUpdating] = useState(false);
   const [updateError, setUpdateError] = useState('');
+  const [isDemo, setIsDemo] = useState(true);
 
   const loadOrders = useCallback(() => {
     setLoading(true);
@@ -49,11 +51,25 @@ export default function AdminOrders() {
 
     api.get('/admin/orders', { params })
       .then((res) => {
-        setOrders(res.data.data || []);
-        setMeta(res.data.meta);
+        const items = res.data.data || [];
+        if (items.length) {
+          setIsDemo(false);
+          setOrders(items);
+          setMeta(res.data.meta);
+          return;
+        }
+        const query = search.toLowerCase();
+        const demoOrders = adminDemoOrders.filter((order) => (!statusFilter || order.order_status === statusFilter) && (!query || [order.order_number, order.customer_name, order.customer_email].some((value) => value.toLowerCase().includes(query))));
+        setIsDemo(true);
+        setOrders(demoOrders);
+        setMeta({ current_page: 1, last_page: 1 });
       })
       .catch(() => {
-        setOrders([]);
+        const query = search.toLowerCase();
+        const demoOrders = adminDemoOrders.filter((order) => (!statusFilter || order.order_status === statusFilter) && (!query || [order.order_number, order.customer_name, order.customer_email].some((value) => value.toLowerCase().includes(query))));
+        setIsDemo(true);
+        setOrders(demoOrders);
+        setMeta({ current_page: 1, last_page: 1 });
       })
       .finally(() => setLoading(false));
   }, [page, search, statusFilter]);
@@ -67,6 +83,11 @@ export default function AdminOrders() {
     setUpdating(true);
     setUpdateError('');
     try {
+      if (isDemo) {
+        setOrders((current) => current.map((order) => order.id === selected.id ? { ...order, order_status: newStatus } : order));
+        setSelected(null);
+        return;
+      }
       await api.post(`/admin/orders/${selected.id}/status`, { status: newStatus });
       loadOrders();
       setSelected(null);
@@ -86,6 +107,8 @@ export default function AdminOrders() {
           <h1 className="admin-page-title">COMMANDES</h1>
         </div>
       </div>
+
+      {isDemo && <p className="admin-demo-notice">APERÇU DE DÉMONSTRATION · MODIFICATIONS LOCALES UNIQUEMENT</p>}
 
       {/* ── Filtres & Recherche ── */}
       <div style={{ display: 'flex', gap: '16px', marginBottom: '28px', flexWrap: 'wrap' }}>
@@ -220,8 +243,20 @@ export default function AdminOrders() {
           onClick={(e) => e.target === e.currentTarget && setSelected(null)}
         >
           <div className="admin-modal">
-            <p className="admin-modal-eyebrow">FICHE DE COMMANDE</p>
-            <h2 className="admin-modal-title">{selected.order_number}</h2>
+            <div className="admin-modal-header">
+              <div>
+                <p className="admin-modal-eyebrow">FICHE DE COMMANDE</p>
+                <h2 className="admin-modal-title">{selected.order_number}</h2>
+              </div>
+              <button
+                type="button"
+                className="admin-modal-close"
+                onClick={() => setSelected(null)}
+                aria-label="Fermer"
+              >
+                ✕
+              </button>
+            </div>
 
             {updateError && <div className="admin-alert-error">{updateError}</div>}
 

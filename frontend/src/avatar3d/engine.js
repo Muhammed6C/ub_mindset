@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { AVATAR_CONFIG } from './avatarConfig.js';
+import { AVATAR_GARMENTS } from '../config/avatarExperience.js';
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -20,6 +21,7 @@ export class AvatarEngine {
     this.profile = null;
     this.model = null;
     this.baseScale = 1;
+    this.modelHeight = 1;
     this.animationFrame = null;
     this.handleWindowResize = null;
 
@@ -53,7 +55,9 @@ export class AvatarEngine {
     this.controls.update();
 
     this.character = new THREE.Group();
+    this.outfitGroup = new THREE.Group();
     this.scene.add(this.character);
+    this.character.add(this.outfitGroup);
 
     this.observeResize();
     this.resize();
@@ -91,6 +95,7 @@ export class AvatarEngine {
     // Aligner les pieds sur le sol puis normaliser à la taille de référence.
     const box = new THREE.Box3().setFromObject(model);
     const modelHeight = Math.max(box.max.y - box.min.y, 0.001);
+    this.modelHeight = modelHeight;
     model.position.y -= box.min.y;
 
     this.baseScale = (AVATAR_CONFIG.referenceHeightCm / 100) / modelHeight;
@@ -126,6 +131,55 @@ export class AvatarEngine {
     if (this.profile) this.setBodyProfile(this.profile);
 
     return { availableMorphs: this.availableMorphs, boundMorphs: Object.keys(this.morphBindings) };
+  }
+
+  setOutfit(items = []) {
+    while (this.outfitGroup.children.length) {
+      const mesh = this.outfitGroup.children.pop();
+      mesh.geometry?.dispose?.();
+      mesh.material?.dispose?.();
+    }
+
+    // Aperçu volumétrique temporaire, affiché tant qu'une pièce n'a pas encore
+    // de mesh skinné validé dans le pipeline d'assets.
+    const height = this.modelHeight;
+    items.forEach((item) => {
+      const garment = AVATAR_GARMENTS[item.product.id];
+      if (!garment) return;
+      const material = new THREE.MeshStandardMaterial({ color: garment.fallbackColor, roughness: 0.78, metalness: 0.02, side: THREE.DoubleSide });
+      if (garment.category === 'bas') {
+        [-0.105, 0.105].forEach((x) => {
+          const mesh = new THREE.Mesh(new THREE.CylinderGeometry(height * 0.105, height * 0.12, height * 0.38, 20, 1, true), material.clone());
+          mesh.position.set(x * height, height * 0.3, 0);
+          this.outfitGroup.add(mesh);
+        });
+        return;
+      }
+      const isJacket = garment.category === 'veste';
+      const mesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(height * (isJacket ? 0.23 : 0.19), height * (isJacket ? 0.26 : 0.22), height * (isJacket ? 0.42 : 0.34), 24, 1, true),
+        material,
+      );
+      mesh.position.set(0, height * 0.62, 0);
+      this.outfitGroup.add(mesh);
+    });
+  }
+
+  setAppearance({ skinTone } = {}) {
+    if (!this.model || !skinTone) return;
+    this.model.traverse((node) => {
+      if (!node.isMesh) return;
+      const materials = Array.isArray(node.material) ? node.material : [node.material];
+      materials.forEach((material) => {
+        if (material?.color) material.color.set(skinTone);
+      });
+    });
+  }
+
+  resetView() {
+    this.camera.position.set(0, 1.05, 3.4);
+    this.controls.target.set(0, 0.95, 0);
+    this.controls.update();
   }
 
   setBodyProfile(profile) {
@@ -203,6 +257,7 @@ export class AvatarEngine {
 
     this.morphBindings = {};
     this.availableMorphs = [];
+    this.setOutfit([]);
     this.model = null;
   }
 }

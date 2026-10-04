@@ -37,6 +37,18 @@
 
 .collection-heading-space { display: inline; }
 
+.collection-card__avatar {
+  min-height: 36px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  background: transparent;
+  color: #1a1a1a;
+  font: 800 .54rem/1 "Archivo Narrow", sans-serif;
+  letter-spacing: .1em;
+  padding: 0 8px;
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .collection-rail__track { cursor: auto; }
   .collection-rail__track .collection-card { flex-basis: 67vw !important; }

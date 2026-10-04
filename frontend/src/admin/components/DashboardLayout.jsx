@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -6,6 +6,17 @@ import '../admin.css';
 
 export default function DashboardLayout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Lock body scroll while admin interface is mounted
+  useEffect(() => {
+    document.body.classList.add('admin-active');
+    document.documentElement.classList.add('admin-active');
+    return () => {
+      document.body.classList.remove('admin-active');
+      document.documentElement.classList.remove('admin-active');
+    };
+  }, []);
 
   return (
     <div className="ub-admin-app">
@@ -21,12 +32,19 @@ export default function DashboardLayout({ children }) {
       <Sidebar
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
+        collapsed={sidebarCollapsed}
       />
 
       {/* ── Main Viewport ── */}
-      <div className="ub-admin-viewport">
+      <div
+        className={`ub-admin-viewport ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}
+      >
         {/* Top Header */}
-        <Header onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} />
+        <Header
+          onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
+          sidebarCollapsed={sidebarCollapsed}
+        />
 
         {/* Scrollable Content Area */}
         <main className="ub-admin-main">
