@@ -3,7 +3,6 @@
 // et libère les ressources WebGL au démontage.
 
 import { useEffect, useRef, useState } from 'react';
-import { AvatarEngine } from '../avatar3d/engine';
 import { AVATAR_CONFIG } from '../avatar3d/avatarConfig';
 import './AvatarViewer.css';
 
@@ -30,9 +29,12 @@ export default function AvatarViewer({ profile, items = [], appearance, modelUrl
   useEffect(() => {
     let cancelled = false;
     let engine;
+    const controller = new AbortController();
 
     const setup = async () => {
       try {
+        const { AvatarEngine } = await import('../avatar3d/engine');
+        if (cancelled) return;
         engine = new AvatarEngine(containerRef.current);
       } catch {
         if (!cancelled) setStatus('error');
@@ -43,10 +45,11 @@ export default function AvatarViewer({ profile, items = [], appearance, modelUrl
 
       try {
         try {
-          await engine.load(modelUrl);
+          await engine.load(modelUrl, controller.signal);
         } catch (error) {
+          if (controller.signal.aborted) return;
           if (!fallbackModelUrl) throw error;
-          await engine.load(fallbackModelUrl);
+          await engine.load(fallbackModelUrl, controller.signal);
         }
         if (cancelled) return;
         if (profileRef.current) engine.setBodyProfile(profileRef.current);
@@ -58,10 +61,22 @@ export default function AvatarViewer({ profile, items = [], appearance, modelUrl
       }
     };
 
-    setup();
+    let observer;
+    if (typeof IntersectionObserver === 'undefined') {
+      setup();
+    } else {
+      observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        setup();
+      }, { rootMargin: '160px 0px' });
+      observer.observe(containerRef.current);
+    }
 
     return () => {
       cancelled = true;
+      controller.abort();
+      observer?.disconnect();
       if (engine) engine.dispose();
       engineRef.current = null;
     };

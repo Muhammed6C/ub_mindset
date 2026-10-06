@@ -1,13 +1,44 @@
-import React from 'react';
+import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import HeroBanner from '../components/HeroBanner';
 import StatCard from '../components/StatCard';
-import SalesChart from '../components/SalesChart';
 import PopularProducts from '../components/PopularProducts';
 import RecentOrders from '../components/RecentOrders';
 import LowStock from '../components/LowStock';
 import LatestProducts from '../components/LatestProducts';
 import { kpiStats } from '../data/dashboardMockData';
+
+const SalesChart = lazy(() => import('../components/SalesChart'));
+
+function DeferredSalesChart() {
+  const sectionRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(() => typeof IntersectionObserver === 'undefined');
+
+  useEffect(() => {
+    if (isVisible || !sectionRef.current) return undefined;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      setIsVisible(true);
+      observer.disconnect();
+    }, { rootMargin: '200px 0px' });
+
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, [isVisible]);
+
+  return (
+    <div ref={sectionRef}>
+      {isVisible ? (
+        <Suspense fallback={<div className="ub-card ub-sales-chart-card" aria-busy="true">Chargement du graphique…</div>}>
+          <SalesChart />
+        </Suspense>
+      ) : (
+        <div className="ub-card ub-sales-chart-card" aria-label="Graphique des ventes" />
+      )}
+    </div>
+  );
+}
 
 export default function AdminDashboard() {
   const scrollToSales = () => {
@@ -45,7 +76,7 @@ export default function AdminDashboard() {
           {/* 3. Mid Row: SalesChart + PopularProducts */}
           <div id="sales-chart-section" className="ub-mid-grid-row">
             <div className="ub-mid-left">
-              <SalesChart />
+              <DeferredSalesChart />
             </div>
             <div className="ub-mid-right">
               <PopularProducts />

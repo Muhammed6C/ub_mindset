@@ -1,11 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { recentOrders } from '../data/dashboardMockData';
+import { getAdminImage } from './adminImage';
 
 const STATUS_CLASSES = {
-  preparing: 'ub-badge-preparing',
-  shipped: 'ub-badge-shipped',
-  delivered: 'ub-badge-delivered',
+  preparing: 'processing',
+  shipped: 'shipped',
+  delivered: 'delivered',
 };
 
 export default function RecentOrders() {
@@ -23,11 +24,13 @@ export default function RecentOrders() {
           <div key={o.id} className="ub-recent-order-item">
             <div className="ub-order-thumb">
               <img
-                src={o.image}
+                src={getAdminImage(o.image)}
                 alt={o.product}
+                loading="lazy"
+                decoding="async"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = '/assets/demo-collection.png';
+                  e.target.src = '/assets/admin-demo-collection.webp';
                 }}
               />
             </div>
@@ -43,7 +46,7 @@ export default function RecentOrders() {
             </div>
 
             <div className="ub-order-status-wrap">
-              <span className={`ub-order-status-badge ${STATUS_CLASSES[o.statusType] || 'ub-badge-preparing'}`}>
+              <span className={`admin-badge admin-badge--status admin-badge--${STATUS_CLASSES[o.statusType] || 'unknown'}`}>
                 {o.status}
               </span>
             </div>

@@ -20,13 +20,13 @@ export default function HeroBanner({ onStatsClick }) {
       {/* ── Right Editorial Visual ── */}
       <div className="ub-hero-figure" aria-hidden="true">
         <img
-          src="/assets/bestUB.png"
+          src="/assets/admin-dashboard-hero.webp"
           alt=""
           className="ub-hero-img"
           decoding="async"
+          fetchPriority="high"
         />
       </div>
     </section>
   );
 }
-

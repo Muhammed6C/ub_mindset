@@ -181,14 +181,15 @@ export default function AdminShipping() {
                   <td style={{ color: '#8C8C8C' }}>{z.free_over ? fmtFCFA(z.free_over) : 'NON SPÉCIFIÉ'}</td>
                   <td style={{ color: '#8C8C8C' }}>{z.estimated_days || '—'}</td>
                   <td>
-                    <span
-                      className={`admin-badge ${z.is_active ? 'admin-badge-active' : 'admin-badge-inactive'}`}
-                      style={{ cursor: 'pointer' }}
+                    <button
+                      type="button"
+                      className={`admin-badge ${z.is_active ? 'admin-badge--success' : 'admin-badge--muted'}`}
+                      aria-pressed={z.is_active}
                       onClick={() => toggleActive(z)}
                       title="Cliquer pour activer/désactiver"
                     >
                       {z.is_active ? 'ACTIVE' : 'INACTIVE'}
-                    </span>
+                    </button>
                   </td>
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'inline-flex', gap: 8 }}>

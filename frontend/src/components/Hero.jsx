@@ -70,8 +70,8 @@ export default function Hero() {
       <div className="hv2-img-col">
         <img
           ref={imgRef}
-          src="/hero-desktop.webp"
-          srcSet="/hero-mobile.webp 480w, /hero-desktop.webp 1024w"
+          src="/hero-desktop-optimized.webp"
+          srcSet="/hero-mobile-optimized.webp 480w, /hero-desktop-optimized.webp 1024w"
           sizes="(max-width: 768px) 100vw, 40vw"
           alt="Athlète UB Mindset — Collection AH 2026"
           className="hv2-img"

@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { latestProducts } from '../data/dashboardMockData';
+import { getAdminImage } from './adminImage';
 
 export default function LatestProducts() {
   return (
@@ -17,11 +18,13 @@ export default function LatestProducts() {
           <div key={p.id} className="ub-product-tile">
             <div className="ub-product-tile-thumb">
               <img
-                src={p.image}
+                src={getAdminImage(p.image)}
                 alt={p.name}
+                loading="lazy"
+                decoding="async"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = '/assets/demo-collection.png';
+                  e.target.src = '/assets/admin-demo-collection.webp';
                 }}
               />
             </div>

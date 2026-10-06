@@ -144,7 +144,7 @@ export default function AdminCategories() {
             <article className="admin-category-card" key={category.id}>
               <div className="admin-category-card__index">{String(index + 1).padStart(2, '0')}</div>
               <div className="admin-category-card__main">
-                <span className={`admin-badge ${category.is_active ? 'admin-badge-active' : 'admin-badge-inactive'}`}>
+                <span className={`admin-badge ${category.is_active ? 'admin-badge--success' : 'admin-badge--muted'}`}>
                   {category.is_active ? 'ACTIVE' : 'MASQUÉE'}
                 </span>
                 <h2>{category.name}</h2>
@@ -168,7 +168,7 @@ export default function AdminCategories() {
       {/* ── Modale Création / Édition ── */}
       {modal && (
         <div className="admin-modal-overlay" onClick={(event) => event.target === event.currentTarget && setModal(null)}>
-          <div className="admin-modal">
+          <div className="admin-modal admin-modal--category-style">
             <div className="admin-modal-header">
               <div>
                 <p className="admin-modal-eyebrow">{modal === 'create' ? 'NOUVELLE CATÉGORIE' : 'MODIFICATION CATÉGORIE'}</p>

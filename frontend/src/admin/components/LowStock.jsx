@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { lowStockItems } from '../data/dashboardMockData';
+import { getAdminImage } from './adminImage';
 
 export default function LowStock() {
   return (
@@ -21,11 +22,13 @@ export default function LowStock() {
           >
             <div className="ub-low-stock-thumb">
               <img
-                src={item.image}
+                src={getAdminImage(item.image)}
                 alt={item.name}
+                loading="lazy"
+                decoding="async"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = '/assets/demo-collection.png';
+                  e.target.src = '/assets/admin-demo-collection.webp';
                 }}
               />
             </div>
@@ -36,7 +39,7 @@ export default function LowStock() {
             </div>
 
             <div className="ub-low-stock-action">
-              <span className="ub-badge-low-stock">
+              <span className="admin-badge admin-badge--warning">
                 {item.status}
               </span>
               <span className="ub-low-stock-arrow">›</span>

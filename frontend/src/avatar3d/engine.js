@@ -81,9 +81,40 @@ export class AvatarEngine {
     this.scene.add(rim);
   }
 
-  async load(modelUrl = AVATAR_CONFIG.modelUrl) {
+  async load(modelUrl = AVATAR_CONFIG.modelUrl, signal) {
     const loader = new GLTFLoader();
-    const gltf = await loader.loadAsync(modelUrl);
+    let gltf;
+
+    if (typeof DecompressionStream !== 'undefined') {
+      const response = await fetch(`${modelUrl}.gz`, { signal });
+      if (response.status === 404) {
+        gltf = await loader.loadAsync(modelUrl);
+      } else {
+        if (!response.ok) {
+          throw new Error(`Chargement du modèle avatar impossible (${response.status}).`);
+        }
+
+        let data = await response.arrayBuffer();
+        const header = new Uint8Array(data, 0, 4);
+        if (header[0] === 0x1f && header[1] === 0x8b) {
+          const stream = new Blob([data]).stream().pipeThrough(new DecompressionStream('gzip'));
+          data = await new Response(stream).arrayBuffer();
+        }
+
+        const glbHeader = new Uint8Array(data, 0, 4);
+        if (glbHeader[0] !== 0x67 || glbHeader[1] !== 0x6c || glbHeader[2] !== 0x54 || glbHeader[3] !== 0x46) {
+          throw new Error('Le fichier avatar reçu n’est pas un modèle GLB valide.');
+        }
+
+        if (signal?.aborted) throw signal.reason;
+        const basePath = new URL('.', new URL(modelUrl, window.location.href)).href;
+        gltf = await loader.parseAsync(data, basePath);
+      }
+    } else {
+      gltf = await loader.loadAsync(modelUrl);
+    }
+
+    if (signal?.aborted) throw signal.reason;
     const model = gltf.scene;
 
     model.traverse((node) => {

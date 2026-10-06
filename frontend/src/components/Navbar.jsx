@@ -126,7 +126,7 @@ export default function Navbar({ cartCount = 0 }) {
             }}
           >
             <img
-              src="/logo.png"
+              src="/logo-optimized.webp"
               alt="UB Mindset"
               style={{
                 height: isPill ? '32px' : '44px',
@@ -702,7 +702,7 @@ export default function Navbar({ cartCount = 0 }) {
           }}
         >
           <img
-            src="/logo.png"
+            src="/logo-optimized.webp"
             alt="UB Mindset"
             style={{ height: '32px', width: 'auto', mixBlendMode: 'multiply' }}
           />

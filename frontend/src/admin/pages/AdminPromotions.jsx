@@ -186,14 +186,15 @@ export default function AdminPromotions() {
                     {p.ends_at ? new Date(p.ends_at).toLocaleDateString('fr-FR') : 'ILLIMITÉE'}
                   </td>
                   <td>
-                    <span
-                      className={`admin-badge ${p.is_active ? 'admin-badge-active' : 'admin-badge-inactive'}`}
-                      style={{ cursor: 'pointer' }}
+                    <button
+                      type="button"
+                      className={`admin-badge ${p.is_active ? 'admin-badge--success' : 'admin-badge--muted'}`}
+                      aria-pressed={p.is_active}
                       onClick={() => toggleActive(p)}
                       title="Cliquer pour basculer actif/inactif"
                     >
                       {p.is_active ? 'ACTIF' : 'INACTIF'}
-                    </span>
+                    </button>
                   </td>
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'inline-flex', gap: 8 }}>

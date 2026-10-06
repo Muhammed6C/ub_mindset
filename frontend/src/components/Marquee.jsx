@@ -14,7 +14,7 @@ export default function Marquee() {
   const renderItems = (group) => ITEMS.map((item) => (
     <span className="marquee-item" key={`${group}-${item}`}>
       <span className="marquee-text">{item}</span>
-      <img className="marquee-logo" src="/only-ub.png" alt="" aria-hidden="true" />
+      <img className="marquee-logo" src="/only-ub-optimized.webp" alt="" aria-hidden="true" />
     </span>
   ));
 

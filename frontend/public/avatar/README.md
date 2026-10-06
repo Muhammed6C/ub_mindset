@@ -7,6 +7,7 @@ Conserve les modèles dans ce dossier :
 ```
 frontend/public/avatar/
 ├── mannequin_homme_base.glb
+├── mannequin_homme_base.glb.gz  # version compressée utilisée en priorité
 ├── mannequin_femme_base.glb
 ├── mannequin_neutre_base.glb
 └── garments/
@@ -44,8 +45,13 @@ frontend/public/avatar/mannequin_homme_base.glb
 ```
 
 Le code (voir `frontend/src/avatar3d/avatarConfig.js`) le charge automatiquement
-depuis `/avatar/ub-avatar-base.glb`. Tant que le fichier est absent, la page
-`/essayage` affiche un message de secours « Avatar 3D indisponible ».
+depuis `/avatar/mannequin_homme_base.glb`. Si le fichier compagnon
+`mannequin_homme_base.glb.gz` est présent et que le navigateur prend en charge
+la décompression gzip, il est utilisé en priorité ; son contenu est strictement
+identique au GLB original. Le GLB non compressé reste disponible comme solution
+de repli. Après remplacement du modèle, régénère aussi le fichier `.glb.gz`.
+Tant que le modèle est absent, la page `/essayage` affiche un message de secours
+« Avatar 3D indisponible ».
 
 Si tu utilises un autre nom de fichier, tu as juste à modifier la valeur
 `modelUrl` dans `frontend/src/avatar3d/avatarConfig.js`.

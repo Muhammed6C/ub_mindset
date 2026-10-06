@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import '../admin.css';
+import { getAdminProducts } from '../services/adminProductsCache';
 
 export default function DashboardLayout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -12,6 +13,13 @@ export default function DashboardLayout({ children }) {
   useEffect(() => {
     document.body.classList.add('admin-active');
     document.documentElement.classList.add('admin-active');
+    void import('../pages/AdminProducts').catch((error) => {
+      console.error('Impossible de précharger la page Produits.', error);
+    });
+    void import('../pages/AdminStock');
+    getAdminProducts().catch((error) => {
+      console.error('Impossible de précharger le catalogue administrateur.', error);
+    });
     return () => {
       document.body.classList.remove('admin-active');
       document.documentElement.classList.remove('admin-active');
